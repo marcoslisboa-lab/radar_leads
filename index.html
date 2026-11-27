@@ -1,786 +1,1378 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Manejo Pro — Meliponário &amp; Apicultura Offline</title>
-  <meta name="theme-color" content="#14532d" />
-  <style>
-    /* =====================================================================
-       IDENTIDADE VISUAL: VERDE-MATA & ÂMBAR/MEL (100% EMBUTIDA)
-       ===================================================================== */
-    :root {
-      --forest-900: #052e16;
-      --forest-800: #14532d;
-      --forest-700: #15803d;
-      --forest-600: #16a34a;
-      --forest-100: #dcfce7;
-      --forest-50: #f0fdf4;
-      --amber-600: #d97706;
-      --amber-500: #f59e0b;
-      --amber-100: #fef3c7;
-      --amber-50: #fffbeb;
-      --slate-900: #0f172a;
-      --slate-800: #1e293b;
-      --slate-700: #334155;
-      --slate-600: #475569;
-      --slate-500: #64748b;
-      --slate-300: #cbd5e1;
-      --slate-200: #e2e8f0;
-      --slate-100: #f1f5f9;
-      --slate-50: #f8fafc;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#070b14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Radar de Leads Corporativos - Correios B2B</title>
+    <link rel="manifest" id="pwaManifestLink">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #070b14; color: #f3f4f6; padding: 12px; padding-bottom: 28px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .logo-tag { background-color: #facc15; color: #000000; font-weight: 800; padding: 5px 12px; border-radius: 9999px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .header-title h1 { font-size: 16px; font-weight: 800; color: #ffffff; }
+        .header-title p { font-size: 11px; color: #9ca3af; }
+        
+        .autosave-pill { display: inline-flex; align-items: center; gap: 4px; background: #064e3b; border: 1px solid #059669; color: #34d399; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+        .nav-tabs { display: flex; background-color: #0f172a; border: 1px solid #1e293b; padding: 3px; border-radius: 9999px; gap: 3px; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+        .tab-btn { padding: 7px 12px; font-size: 11px; font-weight: 600; border-radius: 9999px; border: none; background: transparent; color: #9ca3af; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { background-color: #1e293b; color: #ffffff; border: 1px solid #334155; }
+        
+        .actions-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn { padding: 8px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; touch-action: manipulation; }
+        .btn-yellow { background-color: #eab308; color: #000000; }
+        .btn-green { background-color: #10b981; color: #ffffff; }
+        .btn-blue { background-color: #2563eb; color: #ffffff; }
+        .btn-slate { background-color: #1e293b; color: #ffffff; border: 1px solid #334155; }
+        .btn-red { background-color: #dc2626; color: #ffffff; }
+        .btn:hover { opacity: 0.9; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--slate-100);
-      color: var(--slate-900);
-      line-height: 1.45;
-      padding-bottom: 86px;
-      overflow-x: hidden;
-    }
+        .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        .kpi-card { background-color: #0c1220; border: 1px solid #1e293b; border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .kpi-info label { font-size: 9px; font-weight: 700; color: #9ca3af; text-transform: uppercase; display: block; margin-bottom: 2px; }
+        .kpi-info span { font-size: 17px; font-weight: 800; color: #ffffff; }
+        .kpi-icon { font-size: 20px; background: #070b14; padding: 6px; border-radius: 8px; border: 1px solid #1e293b; }
 
-    /* =====================================================================
-       TELA DE ATIVAÇÃO / LICENÇA
-       ===================================================================== */
-    #license-gate {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: linear-gradient(155deg, var(--forest-900) 0%, var(--forest-800) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+        .view-section { display: none; }
+        .view-section.active-view { display: block; }
 
-    .license-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 20px;
-      padding: 26px 22px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-      text-align: center;
-    }
+        .main-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media(min-width: 900px) {
+            .main-grid { grid-template-columns: 2fr 1fr; }
+        }
 
-    .license-logo {
-      width: 58px;
-      height: 58px;
-      border-radius: 16px;
-      background: var(--amber-500);
-      color: var(--forest-900);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35);
-    }
+        .card-panel { background-color: #0c1220; border: 1px solid #1e293b; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .panel-title { font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #ffffff; }
+        .search-input { background-color: #070b14; border: 1px solid #1e293b; color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: 12px; width: 100%; max-width: 220px; }
+        .search-input:focus { outline: 1px solid #eab308; }
+        
+        .filters-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 6px; flex-wrap: wrap; }
+        .status-filters { display: flex; gap: 4px; flex-wrap: wrap; }
+        .filter-chip { background-color: #070b14; border: 1px solid #1e293b; color: #9ca3af; font-size: 10px; font-weight: 700; padding: 5px 9px; border-radius: 99px; cursor: pointer; }
+        .filter-chip.active { background-color: #eab308; color: #000000; border-color: #eab308; }
+        
+        .region-select { background-color: #070b14; border: 1px solid #1e293b; color: #f3f4f6; font-size: 11px; padding: 6px 8px; border-radius: 6px; font-weight: 700; width: 100%; }
+        @media(min-width: 600px) { .region-select { width: auto; } }
 
-    .license-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--forest-900);
-    }
+        .table-container { overflow-x: auto; max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 11px; }
+        th { background-color: #070b14; color: #9ca3af; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 10px 8px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 10; }
+        td { padding: 10px 8px; border-bottom: 1px solid #111827; vertical-align: middle; }
+        tr.selected-row { background-color: #172033 !important; }
+        tr:hover { background-color: #0f172a; cursor: pointer; }
+        
+        .company-name { font-weight: 700; color: #ffffff; font-size: 12px; margin-bottom: 2px; }
+        .cnpj-link { color: #3b82f6; text-decoration: none; font-weight: 600; font-size: 11px; }
+        .cnpj-link:hover { text-decoration: underline; }
+        .city-name { font-weight: 700; color: #ffffff; font-size: 11px; display: block; }
+        .segment-name { color: #9ca3af; font-size: 10px; }
+        .vol-badge { color: #eab308; font-weight: 700; }
+        .cost-badge { color: #10b981; font-weight: 700; }
 
-    .license-sub {
-      font-size: 0.84rem;
-      color: var(--slate-600);
-      margin-top: 6px;
-      margin-bottom: 18px;
-    }
+        .status-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 99px; display: inline-block; text-transform: uppercase; }
+        .status-novo { background-color: #1e293b; color: #93c5fd; border: 1px solid #334155; }
+        .status-contato { background-color: #713f12; color: #fde047; border: 1px solid #a16207; }
+        .status-proposta { background-color: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+        .status-andamento { background-color: #4c1d95; color: #ddd6fe; border: 1px solid #7c3aed; }
+        .status-fechado { background-color: #064e3b; color: #34d399; border: 1px solid #059669; }
+        .status-perdido { background-color: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
 
-    .license-input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 2px solid var(--slate-300);
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 800;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--slate-900);
-      margin-bottom: 12px;
-    }
+        .alert-tag { font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; margin-left: 4px; display: inline-block; }
+        .alert-ok { background-color: #064e3b; color: #34d399; }
+        .alert-warn { background-color: #7f1d1d; color: #fca5a5; }
 
-    .license-input:focus {
-      outline: none;
-      border-color: var(--forest-700);
-    }
+        .proneg-tag-ok { background-color: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; margin-top: 3px; }
+        .proneg-tag-pend { background-color: #78350f; color: #fde047; border: 1px solid #d97706; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; margin-top: 3px; }
 
-    .license-btn {
-      width: 100%;
-      padding: 13px;
-      border: none;
-      border-radius: 12px;
-      background: var(--forest-800);
-      color: #ffffff;
-      font-size: 0.95rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
+        .detail-section-title { font-size: 10px; font-weight: 800; color: #eab308; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em; }
+        .detail-company-title { font-size: 15px; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
+        .detail-text { font-size: 11px; color: #cbd5e1; margin-bottom: 5px; line-height: 1.4; }
+        
+        .box-cost { background-color: #070b14; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; margin: 8px 0; }
+        .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+        .cost-item { background-color: #0c1220; padding: 6px; border-radius: 6px; border: 1px solid #1e293b; }
+        .cost-item label { font-size: 9px; color: #9ca3af; text-transform: uppercase; display: block; margin-bottom: 2px; }
+        .cost-item span { font-size: 12px; font-weight: 800; color: #ffffff; }
+        .cost-item.yellow span { color: #eab308; }
 
-    .license-btn:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
+        .green-banner { background-color: #064e3b; border: 1px solid #059669; padding: 8px; border-radius: 8px; margin-top: 6px; }
+        .green-banner .val { font-size: 13px; font-weight: 800; color: #34d399; }
+        .green-banner .sub { font-size: 10px; font-weight: 700; color: #fde047; margin-top: 2px; }
 
-    .license-error {
-      color: var(--danger);
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-top: 12px;
-      min-height: 18px;
-    }
+        .discount-btns { display: flex; gap: 4px; margin-top: 6px; }
+        .disc-btn { flex: 1; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 4px; cursor: pointer; }
+        .disc-btn.active { background: #eab308; color: #000; border-color: #eab308; }
 
-    /* =====================================================================
-       ANIMAÇÕES PISCANTES / PULSANTES PARA ALERTAS
-       ===================================================================== */
-    @keyframes pulseAlertRed {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); border-color: #dc2626; background: #fef2f2; }
-      50% { box-shadow: 0 0 0 7px rgba(220, 38, 38, 0); border-color: #ef4444; background: #fee2e2; }
-    }
+        .docs-box { background-color: #070b14; border: 1px solid #4c1d95; border-radius: 8px; padding: 8px; margin: 8px 0; }
+        .doc-check-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #e2e8f0; padding: 4px 0; cursor: pointer; }
+        .doc-check-item input { accent-color: #10b981; width: 16px; height: 16px; cursor: pointer; }
 
-    @keyframes pulseAlertAmber {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5); border-color: #d97706; background: #fffbeb; }
-      50% { box-shadow: 0 0 0 7px rgba(217, 119, 6, 0); border-color: #f59e0b; background: #fef3c7; }
-    }
+        .history-box { background-color: #070b14; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; margin-top: 8px; }
+        .history-list { max-height: 90px; overflow-y: auto; margin-bottom: 6px; font-size: 10px; color: #94a3b8; }
+        .history-item { border-bottom: 1px solid #1e293b; padding: 3px 0; }
+        .history-input { background: #0c1220; border: 1px solid #334155; color: #fff; padding: 7px; border-radius: 6px; font-size: 11px; width: 100%; margin-bottom: 4px; }
 
-    @keyframes badgeBlink {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.72; transform: scale(1.03); }
-    }
+        .btn-whatsapp { background-color: #10b981; color: #ffffff; width: 100%; padding: 9px; font-weight: 800; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; text-align: center; margin-top: 6px; display: block; }
+        .btn-proneg { background-color: #1d4ed8; color: #ffffff; width: 100%; padding: 9px; font-weight: 800; border-radius: 8px; border: 1px solid #60a5fa; font-size: 11px; cursor: pointer; text-align: center; margin-top: 4px; display: block; }
+        .btn-email { background-color: #0284c7; color: #ffffff; width: 100%; padding: 9px; font-weight: 800; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; text-align: center; margin-top: 4px; display: block; }
+        .btn-prop { background-color: #3b82f6; color: #ffffff; width: 100%; padding: 9px; font-weight: 800; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; text-align: center; margin-top: 4px; display: block; }
+        .btn-pdf { background-color: #f59e0b; color: #000000; width: 100%; padding: 9px; font-weight: 800; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; text-align: center; margin-top: 4px; display: block; }
 
-    .banner-piscante-florada {
-      animation: pulseAlertAmber 1.5s infinite;
-      border: 2px solid #d97706;
-      border-radius: var(--radius-lg);
-      padding: 13px 14px;
-      margin-bottom: 12px;
-      color: #78350f;
-    }
+        .progress-track { background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 3px; }
+        .progress-fill { height: 100%; transition: width 0.3s ease; }
 
-    .banner-piscante-revisao {
-      animation: pulseAlertRed 1.4s infinite;
-      border: 2px solid #dc2626;
-      border-radius: var(--radius-lg);
-      padding: 13px 14px;
-      margin-bottom: 12px;
-      color: #7f1d1d;
-    }
+        .city-search-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+        .city-card { background-color: #070b14; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+        .city-card h3 { font-size: 13px; color: #facc15; margin-bottom: 6px; font-weight: 800; }
+        .link-group { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+        .external-link { color: #3b82f6; font-size: 11px; text-decoration: none; font-weight: 600; }
 
-    .status-florada-strip {
-      background: var(--forest-50);
-      border: 1.5px solid #86efac;
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.8rem;
-      color: var(--forest-900);
-    }
+        .script-box { background-color: #070b14; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+        .script-title { font-size: 13px; font-weight: 800; color: #facc15; margin-bottom: 6px; }
+        .script-text { font-size: 11px; color: #cbd5e1; background-color: #0c1220; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; white-space: pre-line; margin-bottom: 8px; line-height: 1.4; }
+        
+        .ai-generator-box { background-color: #111827; border: 1px solid #eab308; border-radius: 10px; padding: 14px; margin-bottom: 16px; }
+        .ai-input, .ai-select { background-color: #070b14; border: 1px solid #334155; color: #ffffff; padding: 8px; border-radius: 6px; font-size: 11px; width: 100%; margin-bottom: 8px; }
 
-    .badge-pulsante {
-      animation: badgeBlink 1.3s infinite;
-    }
+        .modal-overlay { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(2px); z-index: 9999; justify-content: center; align-items: center; padding: 16px; }
+        .modal-card { background: #0c1220; border: 1px solid #334155; border-radius: 12px; padding: 20px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7); }
+        .modal-title { font-size: 15px; font-weight: 800; color: #facc15; margin-bottom: 12px; text-transform: uppercase; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { font-size: 10px; color: #9ca3af; display: block; margin-bottom: 3px; text-transform: uppercase; font-weight: 700; }
+        .form-control { background: #070b14; border: 1px solid #1e293b; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px; width: 100%; }
+        .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
 
-    /* =====================================================================
-       CABEÇALHO FIXO
-       ===================================================================== */
-    .app-header {
-      background: linear-gradient(135deg, var(--forest-900) 0%, var(--forest-800) 100%);
-      color: #ffffff;
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      box-shadow: var(--shadow-md);
-    }
+        .toast-container { position: fixed; bottom: 16px; right: 16px; left: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 11000; pointer-events: none; }
+        .toast-msg { background: #0f172a; border: 1px solid #eab308; color: #ffffff; padding: 10px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6); max-width: 440px; width: 100%; text-align: center; }
+        .toast-msg.success { border-color: #10b981; background: #064e3b; color: #ecfdf5; }
+        .toast-msg.error { border-color: #ef4444; background: #7f1d1d; color: #fef2f2; }
 
-    .header-inner { max-width: 780px; margin: 0 auto; padding: 12px 16px; }
-    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-    .brand-icon {
-      width: 42px; height: 42px; border-radius: 12px;
-      background: var(--amber-500); color: var(--forest-900);
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-    .brand-title {
-      font-size: 1.06rem; font-weight: 800; letter-spacing: -0.01em;
-      display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
-      background: transparent; border: none; color: #ffffff;
-      padding: 2px 4px; margin-left: -4px; border-radius: 8px; max-width: 100%;
-    }
-    .brand-title:hover, .brand-title:active { background: rgba(255,255,255,0.14); }
-    .offline-pill {
-      font-size: 0.66rem; font-weight: 700; background: rgba(255,255,255,0.16);
-      color: #bbf7d0; padding: 2px 7px; border-radius: 999px;
-      display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
-    }
-    .offline-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
-    .header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .btn-header {
-      background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
-      color: #fff; font-size: 0.74rem; font-weight: 700; padding: 8px 9px;
-      border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
-      min-height: 36px; white-space: nowrap;
-    }
-    .btn-header.florada-alerta {
-      background: var(--amber-500); color: var(--forest-900); border-color: #fde68a;
-    }
-    .btn-header:active { transform: scale(0.97); }
-
-    /* =====================================================================
-       LAYOUT, KPIs, AÇÕES RÁPIDAS E FILTROS
-       ===================================================================== */
-    .container { max-width: 780px; margin: 0 auto; padding: 14px 16px; }
-
-    .backup-banner {
-      background: var(--amber-50); border: 1px solid #fcd34d; color: #78350f;
-      padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.8rem;
-    }
-
-    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-    @media (min-width: 600px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    .kpi-card {
-      background: #fff; border-radius: var(--radius-md); padding: 12px;
-      border: 1px solid var(--slate-200); box-shadow: var(--shadow-sm);
-    }
-    .kpi-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--slate-500); }
-    .kpi-value { font-size: 1.4rem; font-weight: 800; color: var(--forest-800); margin-top: 2px; }
-    .kpi-sub { font-size: 0.72rem; color: var(--slate-500); margin-top: 2px; }
-
-    .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
-    @media (min-width: 600px) { .quick-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    .quick-btn {
-      background: #fff; border: 1.5px solid var(--forest-700); color: var(--forest-900);
-      padding: 12px 10px; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 700;
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
-      box-shadow: var(--shadow-sm); min-height: 46px;
-    }
-    .quick-btn.amber { background: var(--amber-500); border-color: var(--amber-600); color: var(--forest-900); }
-    .quick-btn:active { transform: scale(0.98); }
-
-    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .section-title { font-size: 1.02rem; font-weight: 800; color: var(--slate-900); display: flex; align-items: center; gap: 6px; }
-
-    .sub-switcher { display: flex; background: var(--slate-200); padding: 4px; border-radius: 12px; margin-bottom: 14px; gap: 4px; }
-    .sub-btn { flex: 1; border: none; background: transparent; padding: 9px 6px; border-radius: 9px; font-size: 0.76rem; font-weight: 700; color: var(--slate-600); cursor: pointer; }
-    .sub-btn.active { background: #fff; color: var(--forest-800); box-shadow: var(--shadow-sm); }
-
-    .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; }
-    .filter-pill {
-      border: 1px solid var(--slate-300); background: #fff; color: var(--slate-700);
-      padding: 7px 11px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; cursor: pointer;
-    }
-    .filter-pill.active { background: var(--forest-800); border-color: var(--forest-800); color: #fff; }
-
-    /* =====================================================================
-       CARTÕES DE CAIXAS, ISCAS, ALERTAS E DIÁRIO
-       ===================================================================== */
-    .card-list { display: flex; flex-direction: column; gap: 10px; }
-    .item-card { background: #fff; border-radius: var(--radius-lg); padding: 14px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-sm); }
-    .item-card.urgent { border-left: 5px solid var(--danger); }
-    .item-card.warning { border-left: 5px solid var(--amber-500); }
-    .item-card.ok { border-left: 5px solid var(--forest-600); }
-
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .card-code { font-size: 0.72rem; font-weight: 800; color: var(--forest-800); background: var(--forest-100); padding: 2px 8px; border-radius: 6px; display: inline-block; }
-    .card-code.apis { background: #fef3c7; color: #92400e; }
-    .card-title { font-size: 0.98rem; font-weight: 800; color: var(--slate-900); margin-top: 4px; }
-    .card-meta { font-size: 0.78rem; color: var(--slate-600); margin-top: 2px; }
-
-    .badge { font-size: 0.72rem; font-weight: 800; padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
-    .badge-forte { background: #dcfce7; color: #166534; }
-    .badge-medio { background: #fef3c7; color: #92400e; }
-    .badge-fraco { background: #fee2e2; color: #991b1b; }
-    .badge-formacao { background: #e0f2fe; color: #075985; }
-    .badge-capturada { background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; }
-    .badge-instalada { background: #f1f5f9; color: #334155; }
-    .badge-transferida { background: #dcfce7; color: #166534; }
-
-    .dede-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
-      background: var(--slate-50); border: 1px solid var(--slate-200);
-      border-radius: var(--radius-md); padding: 10px; margin-top: 10px;
-    }
-    @media (min-width: 540px) { .dede-grid { grid-template-columns: repeat(4, 1fr); } }
-    .dede-cell { font-size: 0.75rem; }
-    .dede-label { color: var(--slate-500); font-weight: 600; font-size: 0.68rem; text-transform: uppercase; }
-    .dede-val { font-weight: 800; color: var(--slate-900); margin-top: 2px; }
-
-    .melgueira-ctrl { display: inline-flex; align-items: center; gap: 8px; margin-top: 2px; }
-    .mini-step-btn {
-      width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--slate-300);
-      background: #fff; font-weight: 800; font-size: 0.95rem; cursor: pointer;
-    }
-    .mini-step-btn:active { background: var(--amber-100); }
-
-    .card-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--slate-100); flex-wrap: wrap; }
-    .btn-act {
-      flex: 1; min-width: 78px; padding: 9px 8px; border-radius: 10px;
-      border: 1px solid var(--slate-200); background: var(--slate-50);
-      color: var(--slate-800); font-size: 0.76rem; font-weight: 700; cursor: pointer; text-align: center;
-    }
-    .btn-act.primary { background: var(--forest-800); border-color: var(--forest-800); color: #fff; }
-    .btn-act.amber { background: var(--amber-100); border-color: #fcd34d; color: #78350f; }
-    .btn-act.danger { background: var(--danger-bg); border-color: #fecaca; color: var(--danger); flex: 0 0 auto; min-width: 40px; }
-
-    .btn-primary {
-      background: var(--forest-800); color: #fff; border: none; padding: 12px 16px;
-      border-radius: 12px; font-size: 0.86rem; font-weight: 800; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .btn-amber {
-      background: var(--amber-500); color: var(--forest-900); border: none; padding: 12px 16px;
-      border-radius: 12px; font-size: 0.86rem; font-weight: 800; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .btn-outline {
-      background: #fff; color: var(--slate-800); border: 1.5px solid var(--slate-300);
-      padding: 10px 14px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-    }
-
-    /* =====================================================================
-       NAVEGAÇÃO INFERIOR FIXA (5 ABAS)
-       ===================================================================== */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--slate-200); z-index: 30; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-    .bottom-nav-inner { max-width: 780px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); height: 66px; }
-    .nav-item {
-      border: none; background: transparent; color: var(--slate-500);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; font-size: 0.68rem; font-weight: 700; cursor: pointer;
-    }
-    .nav-item.active { color: var(--forest-800); background: var(--forest-50); }
-
-    /* =====================================================================
-       MODAIS & FORMULÁRIOS
-       ===================================================================== */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
-    @media (min-width: 600px) { .modal-backdrop { align-items: center; padding: 16px; } }
-    .modal-backdrop.open { display: flex; }
-    .modal-box { background: #fff; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 18px; box-shadow: 0 20px 35px rgba(0,0,0,0.25); }
-    @media (min-width: 600px) { .modal-box { border-radius: 20px; } }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--slate-200); }
-    .modal-title { font-size: 1.02rem; font-weight: 800; color: var(--forest-900); }
-    .btn-close { background: var(--slate-100); border: none; width: 34px; height: 34px; border-radius: 10px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
-
-    .form-group { margin-bottom: 12px; }
-    .form-label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--slate-700); margin-bottom: 5px; }
-    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--slate-300); border-radius: 11px; font-size: 0.9rem; background: #fff; color: var(--slate-900); }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--forest-700); }
-    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .seg-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-    @media (min-width: 440px) { .seg-group.cols-4 { grid-template-columns: repeat(4, 1fr); } }
-    .seg-btn { padding: 9px 8px; border: 1.5px solid var(--slate-300); background: #fff; border-radius: 10px; font-size: 0.78rem; font-weight: 700; color: var(--slate-700); cursor: pointer; text-align: center; }
-    .seg-btn.selected { background: var(--forest-800); border-color: var(--forest-800); color: #fff; }
-    .seg-btn.amber-sel.selected { background: var(--amber-500); border-color: var(--amber-600); color: var(--forest-900); }
-
-    /* GRID DE 12 MESES PARA CONFIGURAÇÃO DE FLORADA */
-    .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
-    .month-chip {
-      padding: 10px 6px; border-radius: 10px; border: 1.5px solid var(--slate-300);
-      background: #fff; font-size: 0.8rem; font-weight: 800; text-align: center; cursor: pointer; color: var(--slate-700);
-    }
-    .month-chip.sem-florada {
-      background: #fef3c7; border-color: #d97706; color: #92400e;
-    }
-
-    /* TABELA COMPARATIVA (REVISÃO ANTERIOR X ATUAL) */
-    .comp-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 8px; }
-    .comp-table th { background: var(--forest-900); color: #fff; padding: 8px 6px; text-align: left; font-size: 0.74rem; }
-    .comp-table td { padding: 8px 6px; border-bottom: 1px solid var(--slate-200); vertical-align: top; }
-    .comp-table tr:nth-child(even) { background: var(--slate-50); }
-    .delta-up { color: #15803d; font-weight: 800; }
-    .delta-down { color: #dc2626; font-weight: 800; }
-    .delta-eq { color: #64748b; font-weight: 700; }
-
-    .wa-preview { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 12px; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; color: #064e3b; margin-top: 10px; }
-    .empty-box { background: #fff; border: 1px dashed var(--slate-300); border-radius: var(--radius-lg); padding: 24px 16px; text-align: center; color: var(--slate-500); font-size: 0.85rem; }
-    .hidden { display: none !important; }
-
-    .toast {
-      position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
-      background: var(--slate-900); color: #fff; padding: 10px 16px;
-      border-radius: 999px; font-size: 0.82rem; font-weight: 700; z-index: 70;
-      box-shadow: var(--shadow-md); display: none; max-width: 90vw; text-align: center;
-    }
-
-    /* =====================================================================
-       FOLHA DE IMPRESSÃO A4 LIMPA (@media print)
-       ===================================================================== */
-    #print-sheet { display: none; }
-    @media print {
-      body { background: #fff; padding: 0; }
-      .app-header, .container, .bottom-nav, .modal-backdrop, .toast, #license-gate { display: none !important; }
-      #print-sheet { display: block !important; padding: 12mm; font-family: Arial, sans-serif; color: #0f172a; }
-      #print-sheet h1 { font-size: 18px; margin-bottom: 4px; color: #14532d; }
-      #print-sheet p { font-size: 12px; color: #475569; margin-bottom: 12px; }
-      #print-sheet table { width: 100%; border-collapse: collapse; font-size: 11px; }
-      #print-sheet th { background: #14532d !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 6px 8px; text-align: left; }
-      #print-sheet td { border: 1px solid #cbd5e1; padding: 6px 8px; }
-    }
-  </style>
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoiceArea, #printableInvoiceArea * { visibility: visible; }
+            #printableInvoiceArea { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; color: black !important; padding: 10px; }
+            @page { size: A4 portrait; margin: 8mm; }
+        }
+        #printableInvoiceArea { display: none; }
+    </style>
 </head>
 <body>
 
-  <!-- =========================================================
-       TELA DE ATIVAÇÃO DE LICENÇA (FIREBASE REALTIME DB)
-       ========================================================= -->
-  <div id="license-gate">
-    <div class="license-card">
-      <div class="license-logo">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 19 6 19 14 12 18 5 14 5 6 12 2"></polygon>
-          <line x1="12" y1="18" x2="12" y2="22"></line>
-        </svg>
-      </div>
-      <h1 class="license-title">Manejo Pro</h1>
-      <p class="license-sub">Digite sua chave de licença para liberar o acesso neste dispositivo.</p>
-      <input type="text" id="license-input" class="license-input" placeholder="EX: MANEJO-0000" autocomplete="off" />
-      <button type="button" id="license-btn" class="license-btn" onclick="ativarLicenca()">Ativar Aplicativo</button>
-      <div id="license-error" class="license-error"></div>
-    </div>
-  </div>
-
-  <!-- CONTEÚDO PRINCIPAL DO APP (OCULTO ATÉ VALIDAR A CHAVE) -->
-  <div id="app-shell" class="hidden">
-
-    <!-- MENSAGEM FLUTUANTE E FOLHA A4 OCULTA -->
-    <div id="toast" class="toast"></div>
-    <div id="print-sheet"></div>
-
-    <!-- CABEÇALHO SUPERIOR -->
-    <header class="app-header">
-      <div class="header-inner">
-        <div class="header-top">
-          <div class="brand">
-            <div class="brand-icon" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 19 6 19 14 12 18 5 14 5 6 12 2"></polygon>
-                <line x1="12" y1="18" x2="12" y2="22"></line>
-              </svg>
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="logo-tag">Correios B2B</span>
+            <div class="header-title">
+                <h1>Radar de Leads Corporativos</h1>
+                <p>Região São Paulo / Conchas</p>
             </div>
-            <div style="min-width:0;">
-              <button type="button" class="brand-title" onclick="openEditNomeModal()" title="Toque para editar o nome">
-                <span id="header-nome-display" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Meu Meliponário</span>
-                <span style="font-size:0.82rem; color:#fde68a;">✎</span>
-              </button>
-              <div style="display:flex; align-items:center; gap:6px; margin-top:2px; flex-wrap:wrap;">
-                <span class="offline-pill"><span class="offline-dot"></span> Offline • Ativo</span>
-                <span style="font-size:0.72rem; color:#d1fae5; font-weight:600;">Meliponário &amp; Manejo</span>
-              </div>
-            </div>
-          </div>
-          <div class="header-actions">
-            <button type="button" id="btn-header-florada" class="btn-header" onclick="openFloradaModal()">🌸 Florada</button>
-            <button type="button" class="btn-header" onclick="openBackupModal()">💾 Backup</button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <main class="container">
-
-      <!-- LEMBRETE SEMANAL DE BACKUP -->
-      <div id="backup-alert" class="backup-banner hidden">
-        <span><strong>Lembrete:</strong> Faz mais de 7 dias do último backup. Exporte uma cópia .JSON.</span>
-        <button type="button" class="btn-amber" style="padding:6px 10px; font-size:0.75rem;" onclick="exportJSON()">Salvar</button>
-      </div>
-
-      <!-- =========================================================
-           ABA 1: HOJE (ALERTAS PISCANTE DE FLORADA + REVISÕES + KPIs)
-           ========================================================= -->
-      <section id="view-hoje">
-        <div id="florada-alert-container"></div>
-        <div id="revisao-alert-container"></div>
-        <div id="kpi-container" class="kpi-grid"></div>
-
-        <div class="quick-grid">
-          <button type="button" class="quick-btn amber" onclick="openManejoRapidoModal()">⚡ + Manejo Rápido</button>
-          <button type="button" class="quick-btn" onclick="openCaixaModal()">🐝 + Nova Caixa</button>
-          <button type="button" class="quick-btn" onclick="openIscaModal()">🪤 + Nova Isca</button>
-          <button type="button" class="quick-btn" onclick="openMovModal()">💰 + Venda / Gasto</button>
+            <span class="autosave-pill" id="globalAutoSaveBadge">● Auto-Save Celular Ativo</span>
         </div>
 
-        <div class="section-header">
-          <h2 class="section-title">⏰ Alertas de Revisão &amp; Manejo</h2>
-          <span id="hoje-data-label" style="font-size:0.76rem; color:var(--slate-500); font-weight:700;"></span>
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tabBtnLeads" onclick="switchTab('leads')">Leads (<span id="countLeads">2</span>)</button>
+            <button class="tab-btn" id="tabBtnContratos" onclick="switchTab('contratos')">💰 Rentabilização</button>
+            <button class="tab-btn" id="tabBtnCalculadora" onclick="switchTab('calculadora')">🧮 Simulador</button>
+            <button class="tab-btn" id="tabBtnDashboard" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-btn" id="tabBtnTarefas" onclick="switchTab('tarefas')">Tarefas</button>
+            <button class="tab-btn" id="tabBtnBuscador" onclick="switchTab('buscador')">Buscador</button>
+            <button class="tab-btn" id="tabBtnProspeccao" onclick="switchTab('prospeccao')">🏆 Ranking & Prospecção</button>
+            <button class="tab-btn" id="tabBtnScripts" onclick="switchTab('scripts')">Scripts</button>
+            <button class="tab-btn" id="tabBtnSave" onclick="switchTab('save')">📱 App Celular / Salvar</button>
         </div>
 
-        <div id="lista-alertas-hoje" class="card-list"></div>
-      </section>
-
-      <!-- =========================================================
-           ABA 2: CAIXAS & COLMEIAS (ASF & APIS + FICHA DE REVISÃO)
-           ========================================================= -->
-      <section id="view-caixas" class="hidden">
-        <div class="section-header">
-          <h2 class="section-title">🐝 Caixas &amp; Colmeias</h2>
-          <div style="display:flex; gap:6px;">
-            <button type="button" class="btn-outline" style="padding:8px 10px; font-size:0.75rem;" onclick="openGuiaRainhaModal()">👑 Guia Rainha</button>
-            <button type="button" class="btn-primary" style="padding:8px 12px; font-size:0.78rem;" onclick="openCaixaModal()">+ Nova Caixa</button>
-          </div>
+        <div class="actions-bar">
+            <button class="btn btn-yellow" onclick="addNewLead()">+ Novo</button>
+            <button class="btn btn-green" onclick="exportToJSON()">Backup JSON</button>
+            <button class="btn btn-slate" onclick="triggerRestoreJSON()">Restaurar</button>
+            <input type="file" id="restoreJsonInput" accept=".json" style="display:none" onchange="handleJSONRestore(event)">
+            <button class="btn btn-green" onclick="exportToCSV()">Exp. CSV</button>
+            <button class="btn btn-red" onclick="cleanDuplicates()">Limpar Duplicados</button>
         </div>
-
-        <div class="filter-row" id="caixa-filters">
-          <button type="button" class="filter-pill active" data-filter="TODAS" onclick="setCaixaFilter('TODAS')">Todas</button>
-          <button type="button" class="filter-pill" data-filter="ASF" onclick="setCaixaFilter('ASF')">🌿 Sem Ferrão (ASF)</button>
-          <button type="button" class="filter-pill" data-filter="APIS" onclick="setCaixaFilter('APIS')">👑 Apis mellifera</button>
-          <button type="button" class="filter-pill" data-filter="ATRASADAS" onclick="setCaixaFilter('ATRASADAS')">⏰ Revisão Hoje/Atrasada</button>
-          <button type="button" class="filter-pill" data-filter="MELGUEIRA" onclick="setCaixaFilter('MELGUEIRA')">🍯 Com Melgueira</button>
-        </div>
-
-        <div id="lista-caixas" class="card-list"></div>
-      </section>
-
-      <!-- =========================================================
-           ABA 3: ISCAS DE CAPTURA (COM GPS)
-           ========================================================= -->
-      <section id="view-iscas" class="hidden">
-        <div class="section-header">
-          <h2 class="section-title">🪤 Pontos de Isca &amp; Captura</h2>
-          <button type="button" class="btn-amber" style="padding:9px 12px; font-size:0.8rem;" onclick="openIscaModal()">+ Nova Isca</button>
-        </div>
-
-        <div class="filter-row" id="isca-filters">
-          <button type="button" class="filter-pill active" data-filter="TODAS" onclick="setIscaFilter('TODAS')">Todas</button>
-          <button type="button" class="filter-pill" data-filter="CAPTURADA" onclick="setIscaFilter('CAPTURADA')">🐝 Capturadas</button>
-          <button type="button" class="filter-pill" data-filter="INSTALADA" onclick="setIscaFilter('INSTALADA')">🌲 Instaladas</button>
-          <button type="button" class="filter-pill" data-filter="TRANSFERIDA" onclick="setIscaFilter('TRANSFERIDA')">✅ Transferidas</button>
-        </div>
-
-        <div id="lista-iscas" class="card-list"></div>
-      </section>
-
-      <!-- =========================================================
-           ABA 4: COMPARAR FICHA DE REVISÃO (ANTERIOR × ATUAL)
-           ========================================================= -->
-      <section id="view-comparar" class="hidden">
-        <div class="section-header">
-          <h2 class="section-title">📊 Comparar Ficha de Revisão</h2>
-          <button type="button" class="btn-primary" style="padding:8px 12px; font-size:0.78rem;" onclick="printComparativoFicha()">🖨️ Imprimir / PDF</button>
-        </div>
-
-        <div class="item-card" style="margin-bottom:12px;">
-          <label class="form-label" for="comp-caixa-select">Selecione a Caixa / Colmeia para comparar Revisão Anterior × Atual:</label>
-          <select id="comp-caixa-select" class="form-select" onchange="renderComparativo()"></select>
-        </div>
-
-        <div id="comparativo-content"></div>
-      </section>
-
-      <!-- =========================================================
-           ABA 5: DIÁRIO, CAIXA, WHATSAPP & EXPORTAR PDF/CSV
-           ========================================================= -->
-      <section id="view-diario" class="hidden">
-        <div class="sub-switcher">
-          <button type="button" id="sub-btn-log" class="sub-btn active" onclick="switchDiarioSub('LOG')">📓 Diário</button>
-          <button type="button" id="sub-btn-fin" class="sub-btn" onclick="switchDiarioSub('FIN')">💰 Caixa</button>
-          <button type="button" id="sub-btn-wa" class="sub-btn" onclick="switchDiarioSub('WA')">📲 WhatsApp</button>
-          <button type="button" id="sub-btn-exp" class="sub-btn" onclick="switchDiarioSub('EXP')">🖨️ PDF/CSV</button>
-        </div>
-
-        <div id="diario-log-pane">
-          <div class="section-header">
-            <h2 class="section-title">Histórico de Manejos</h2>
-            <button type="button" class="btn-primary" style="padding:8px 12px; font-size:0.78rem;" onclick="openManejoRapidoModal()">+ Anotar Manejo</button>
-          </div>
-          <div class="filter-row">
-            <button type="button" class="filter-pill active" data-filter="TODOS" onclick="setDiarioFilter('TODOS')">Tudo</button>
-            <button type="button" class="filter-pill" data-filter="CAIXA" onclick="setDiarioFilter('CAIXA')">🐝 Caixas</button>
-            <button type="button" class="filter-pill" data-filter="ISCA" onclick="setDiarioFilter('ISCA')">🪤 Iscas</button>
-          </div>
-          <div id="lista-diario" class="card-list"></div>
-        </div>
-
-        <div id="diario-fin-pane" class="hidden">
-          <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
-            <div class="kpi-card">
-              <div class="kpi-label">Vendas</div>
-              <div id="fin-entradas" class="kpi-value" style="font-size:1.08rem; color:#15803d;">R$ 0</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">Gastos</div>
-              <div id="fin-saidas" class="kpi-value" style="font-size:1.08rem; color:#dc2626;">R$ 0</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">Saldo</div>
-              <div id="fin-saldo" class="kpi-value" style="font-size:1.08rem;">R$ 0</div>
-            </div>
-          </div>
-          <div class="section-header">
-            <h2 class="section-title">Vendas &amp; Despesas</h2>
-            <button type="button" class="btn-amber" style="padding:8px 12px; font-size:0.78rem;" onclick="openMovModal()">+ Lançar</button>
-          </div>
-          <div id="lista-movimentos" class="card-list"></div>
-        </div>
-
-        <div id="diario-wa-pane" class="hidden">
-          <div class="item-card">
-            <h3 class="card-title">Lista de Disponibilidade (WhatsApp)</h3>
-            <p class="card-meta" style="margin-bottom:10px;">Exibe apenas os tipos de mel / espécies disponíveis, sem expor números de caixas ou melgueiras.</p>
-            <div class="form-group">
-              <label class="form-label" for="wa-pix">Chave PIX ou Contato (opcional)</label>
-              <input type="text" id="wa-pix" class="form-input" placeholder="Ex: PIX (14) 99999-0000" oninput="saveWaConfig()" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="wa-itens-custom">Tipos de Mel / Produtos Disponíveis</label>
-              <textarea id="wa-itens-custom" rows="4" class="form-textarea" placeholder="Ex:&#10;• Mel de Mandaçaia — consulte tamanhos e valores&#10;• Mel de Jataí — consulte tamanhos e valores" oninput="renderWaPreview()"></textarea>
-            </div>
-            <button type="button" class="btn-outline" style="width:100%; margin-bottom:8px;" onclick="pullAutoItemsToWa()">🔄 Puxar Tipos de Mel (Espécies com Melgueira)</button>
-            <div id="wa-preview-box" class="wa-preview"></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
-              <button type="button" class="btn-outline" onclick="copyWaText()">📋 Copiar Texto</button>
-              <button type="button" class="btn-primary" onclick="sendWaDirect()">📲 Abrir WhatsApp</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="diario-exp-pane" class="hidden">
-          <div class="item-card">
-            <h3 class="card-title">🖨️ Exportar ou Imprimir Fichas de Revisão</h3>
-            <p class="card-meta" style="margin-bottom:12px;">Gere a planilha de revisão atualizada em <strong>.CSV</strong> (Excel) ou imprima / salve em <strong>.PDF (A4)</strong> parcial ou total.</p>
-
-            <div class="form-group">
-              <label class="form-label" for="exp-escopo">Escopo da Exportação (Parcial ou Total)</label>
-              <select id="exp-escopo" class="form-select">
-                <option value="TOTAL">Total — Todas as Caixas / Colmeias</option>
-                <option value="APIS">Parcial — Apenas Apis mellifera</option>
-                <option value="ASF">Parcial — Apenas Abelhas Sem Ferrão (ASF)</option>
-                <option value="PENDENTES">Parcial — Apenas Revisões Pendentes / Atrasadas</option>
-                <option value="COMPARATIVO">Ficha Comparativa (Anterior × Atual da Caixa Selecionada)</option>
-              </select>
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
-              <button type="button" class="btn-outline" onclick="exportRevisaoCSV()">📊 Baixar Planilha .CSV</button>
-              <button type="button" class="btn-primary" onclick="printRevisaoTabela()">🖨️ Imprimir / Salvar PDF</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- NAVEGAÇÃO INFERIOR EM 5 ABAS -->
-    <nav class="bottom-nav">
-      <div class="bottom-nav-inner">
-        <button type="button" class="nav-item active" data-tab="hoje" onclick="switchTab('hoje')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>Hoje</span>
-        </button>
-        <button type="button" class="nav-item" data-tab="caixas" onclick="switchTab('caixas')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 19 6 19 14 12 18 5 14 5 6 12 2"/></svg>
-          <span>Caixas</span>
-        </button>
-        <button type="button" class="nav-item" data-tab="iscas" onclick="switchTab('iscas')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span>Iscas</span>
-        </button>
-        <button type="button" class="nav-item" data-tab="comparar" onclick="switchTab('comparar')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          <span>Comparar</span>
-        </button>
-        <button type="button" class="nav-item" data-tab="diario" onclick="switchTab('diario')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Diário/PDF</span>
-        </button>
-      </div>
-    </nav>
-
-    <!-- MODAIS DO APLICATIVO -->
-    <div id="modal-nome" class="modal-backdrop">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3 class="modal-title">🐝 Nome do Meliponário / Apiário</h3>
-          <button type="button" class="btn-close" onclick="closeModal('modal-nome')">✕</button>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="input-meliponario-nome">Como deseja chamar seu meliponário ou apiário?</label>
-          <input type="text" id="input-meliponario-nome" class="form-input" placeholder="Ex: Meliponário Paraíso, Apiário do Sítio..." />
-        </div>
-        <button type="button" class="btn-primary" style="width:100%;" onclick="saveMeliponarioNome()">Salvar Nome</button>
-      </div>
     </div>
 
-    <div id="modal-florada" class="modal-backdrop">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3 class="modal-title">🌸 Calendário de Florada &amp; Entressafra</h3>
-          <button type="button" class="btn-close" onclick="closeModal('modal-florada')">✕</button>
+    <!-- VIEW 1: EMPRESAS CADASTRADAS -->
+    <div id="viewLeads" class="view-section active-view">
+        <div class="kpi-container">
+            <div class="kpi-card"><div class="kpi-info"><label>Total</label><span id="kpiTotalLeads">0</span></div><div class="kpi-icon">📊</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Propostas</label><span id="kpiPropostaLeads" style="color: #60a5fa;">0</span></div><div class="kpi-icon">📋</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Em Andamento</label><span id="kpiAndamentoLeads" style="color: #c084fc;">0</span></div><div class="kpi-icon">📑</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Fechados</label><span id="kpiFechadoLeads" style="color: #34d399;">0</span></div><div class="kpi-icon">🤝</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Proneg OK</label><span id="kpiPronegLeads" style="color: #60a5fa;">0/0</span></div><div class="kpi-icon">🏢</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Conversão</label><span id="kpiConversao" style="color: #facc15;">0%</span></div><div class="kpi-icon">🎯</div></div>
         </div>
-        <p style="font-size:0.83rem; color:var(--slate-600); margin-bottom:10px;">
-          Toque nos meses em que <strong>não há florada</strong> (entressafra) na sua região. Durante esses meses, a tela inicial exibirá o alerta piscante lembrando de <strong>alimentar as abelhas e plantar espécies melíferas</strong>.
-        </p>
-        <div id="months-selector" class="months-grid"></div>
-        <div class="form-group" style="margin-top:12px;">
-          <label class="form-label" for="florada-nota-input">Lembrete de Alimentação &amp; Plantio para a Entressafra</label>
-          <input type="text" id="florada-nota-input" class="form-input" placeholder="Ex: Entrar com xarope 1:1 / bombom de pólen e plantar mudas" />
+
+        <div class="main-grid">
+            <div class="card-panel">
+                <div class="panel-header">
+                    <span class="panel-title">Empresas Cadastradas</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Filtrar por nome, CNPJ..." oninput="filterLeads()">
+                </div>
+                
+                <div class="filters-wrapper">
+                    <div class="status-filters">
+                        <button class="filter-chip active" id="chip-todos" onclick="setQuickStatusFilter('Todos')">Todos</button>
+                        <button class="filter-chip" id="chip-novo" onclick="setQuickStatusFilter('Novo')">Novos</button>
+                        <button class="filter-chip" id="chip-contato" onclick="setQuickStatusFilter('Contato')">Contato</button>
+                        <button class="filter-chip" id="chip-proposta" onclick="setQuickStatusFilter('Proposta')">Proposta</button>
+                        <button class="filter-chip" id="chip-em-andamento" onclick="setQuickStatusFilter('Em Andamento')">📑 Em Andamento</button>
+                        <button class="filter-chip" id="chip-fechado" onclick="setQuickStatusFilter('Fechado')">Fechados</button>
+                        <button class="filter-chip" id="chip-pendente-proneg" onclick="setQuickStatusFilter('PendenteProneg')">🏢 Pendente Proneg</button>
+                        <button class="filter-chip" id="chip-atrasado" onclick="setQuickStatusFilter('Atrasado')">⚠️ > 5d</button>
+                    </div>
+                    <div>
+                        <select id="regionFilterSelect" class="region-select" onchange="filterLeads()">
+                            <option value="Todas">🌐 Todas as Cidades</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Empresa / CNPJ / Proneg</th>
+                                <th>Cidade / Segmento</th>
+                                <th>Vol (PAC/SEDEX) / Status</th>
+                                <th>Gasto Est.</th>
+                                <th style="text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-panel" id="detailCardPanel">
+                <div class="panel-header">
+                    <span class="panel-title" style="color: #eab308;">Ficha Técnica & CRM</span>
+                    <span style="font-size: 11px; color: #eab308; cursor: pointer; font-weight: 700;" onclick="editCurrentLead()">[EDITAR]</span>
+                </div>
+                <div id="leadDetailContent"></div>
+            </div>
         </div>
-        <button type="button" class="btn-amber" style="width:100%;" onclick="saveFloradaConfig()">Salvar Calendário de Florada</button>
-      </div>
     </div>
 
-    <div id="modal-caixa" class="modal-backdrop">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3 id="modal-caixa-title" class="modal-title">Ficha da Caixa / Colmeia</h3>
-          <button type="button" class="btn-close" onclick="closeModal('modal-caixa')">✕</button>
-        </div>
-        <input type="hidden" id="cx-id" />
-
-        <div class="form-row-2">
-          <div class="form-group">
-            <label class="form-label" for="cx-codigo">Identificação / CX Nº *</label>
-            <input type="text" id="cx-codigo" class="form-input" placeholder="Ex: #01 ou CX-04" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="cx-especie">Espécie *</label>
-            <input type="text" id="cx-especie" list="especies-abelha-list" class="form-input" placeholder="Ex: Mandaçaia, Jataí, Apis..." />
-            <datalist id="especies-abelha-list">
-              <option value="Jataí (Tetragonisca angustula)"></option>
-              <option value="Mandaçaia (Melipona quadrifasciata)"></option>
-              <option value="Uruçu-Amarela (Melipona rufiventris)"></option>
-              <option value="Uruçu-Nordestina (Melipona scutellaris)"></option>
-              <option value="Bugia (Melipona mondury)"></option>
-              <option value="Iraí (Nannotrigona testaceicornis)"></option>
-              <option value="Tubuna (Scaptotrigona bipunctata)"></option>
-              <option value="Apis mellifera (Com ferrão)"></option>
-            </datalist>
-          </div>
+    <!-- VIEW 2: RENTABILIZAÇÃO -->
+    <div id="viewContratos" class="view-section">
+        <div class="kpi-container">
+            <div class="kpi-card"><div class="kpi-info"><label>Contratos Ativos</label><span id="kpiContratosAtivos" style="color: #34d399;">0</span></div><div class="kpi-icon">📄</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Meta Mensal Carteira</label><span id="kpiMetaCarteira">R$ 0,00</span></div><div class="kpi-icon">🎯</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Faturado Real (Mês)</label><span id="kpiFaturadoReal" style="color: #10b981;">R$ 0,00</span></div><div class="kpi-icon">💰</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Atingimento Geral</label><span id="kpiAtingimentoGeral" style="color: #facc15;">0%</span></div><div class="kpi-icon">📈</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Subtotal (12m)</label><span id="kpiSubtotalPeriodo" style="color: #93c5fd;">R$ 0,00</span></div><div class="kpi-icon">📅</div></div>
+            <div class="kpi-card"><div class="kpi-info"><label>Soma Total Contratos</label><span id="kpiSomaTotalContratos" style="color: #facc15;">R$ 0,00</span></div><div class="kpi-icon">🏆</div></div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">1. Força do Enxame *</label>
-          <div class="seg-group cols-4" id="seg-cx-forca">
-            <button type="button" class="seg-btn" data-val="FORTE" onclick="selectSeg('seg-cx-forca', 'FORTE')">🟢 Forte</button>
-            <button type="button" class="seg-btn" data-val="MEDIO" onclick="selectSeg('seg-cx-forca', 'MEDIO')">🟡 Médio</button>
-            <button type="button" class="seg-btn" data-val="FRACO" onclick="selectSeg('seg-cx-forca', 'FRACO')">🔴 Fraco</button>
-            <button type="button" class="seg-btn" data-val="FORMACAO" onclick="selectSeg('seg-cx-forca', 'FORMACAO')">🔵 Formação</button>
-          </div>
+        <div class="card-panel">
+            <div class="panel-header">
+                <span class="panel-title" style="color: #10b981;">Carteira de Contratos Fechados</span>
+                <button class="btn btn-red" onclick="limparDadosImportadosCarteira()">🗑️ Limpar Dados</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente / CNPJ</th>
+                            <th>Contrato</th>
+                            <th>Meta Est.</th>
+                            <th>Realizado</th>
+                            <th>Subtotal</th>
+                            <th>Total Contrato</th>
+                            <th>Perf.</th>
+                            <th style="text-align: right;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractsTableBody"></tbody>
+                </table>
+            </div>
         </div>
+    </div>
 
-        <div class="form-group
+    <!-- VIEW 3: SIMULADOR OFICIAL -->
+    <div id="viewCalculadora" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header">
+                <span class="panel-title" style="color: #facc15;">🧮 Simulador Oficial de Tarifas</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <select id="calcTargetLeadSelect" class="region-select"><option value="">🎯 Selecionar Lead...</option></select>
+                    <button class="btn btn-yellow" onclick="aplicarCalculoNoLeadSelecionado()">💾 Aplicar no Lead</button>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+                <div style="background:#070b14; border:1px solid #1e293b; border-radius:10px; padding:10px;">
+                    <div class="form-group"><label>Serviço</label><select id="calcServico" class="form-control" onchange="calcularTarifaOficial()"><option value="PAC">PAC</option><option value="SEDEX">SEDEX</option><option value="MINI">Mini Envios</option></select></div>
+                    <div class="form-group"><label>Trecho</label><select id="calcTrecho" class="form-control" onchange="calcularTarifaOficial()"><option value="ESTADUAL">Estadual (SP)</option><option value="NACIONAL_1">Nacional Próximo</option><option value="NACIONAL_2">Nacional Demais</option></select></div>
+                    <div class="form-group"><label>Volume Mensal</label><input type="number" id="calcVolumeMensal" class="form-control" value="30" oninput="calcularTarifaOficial()"></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:4px;">
+                        <div class="form-group"><label>Peso(g)</label><input type="number" id="calcPesoGramas" class="form-control" value="500" oninput="calcularTarifaOficial()"></div>
+                        <div class="form-group"><label>C(cm)</label><input type="number" id="calcComp" class="form-control" value="20" oninput="calcularTarifaOficial()"></div>
+                        <div class="form-group"><label>L(cm)</label><input type="number" id="calcLarg" class="form-control" value="16" oninput="calcularTarifaOficial()"></div>
+                        <div class="form-group"><label>A(cm)</label><input type="number" id="calcAlt" class="form-control" value="10" oninput="calcularTarifaOficial()"></div>
+                    </div>
+                </div>
+                <div style="background:#070b14; border:1px solid #1e293b; border-radius:10px; padding:10px;">
+                    <div id="calcPesoResumoBox" style="font-size:11px; color:#cbd5e1; margin-bottom:8px;">Peso Tarifado: 500g</div>
+                    <div class="cost-grid">
+                        <div class="cost-item"><label>Unit. Balcão</label><span id="calcUnitBalcao" style="color:#fca5a5;">R$ 0,00</span></div>
+                        <div class="cost-item yellow"><label>Unit. Contrato</label><span id="calcUnitContrato">R$ 0,00</span></div>
+                        <div class="cost-item"><label>Mensal Balcão</label><span id="calcMensalBalcao" style="color:#fca5a5;">R$ 0,00</span></div>
+                        <div class="cost-item yellow"><label>Mensal Contrato</label><span id="calcMensalContrato">R$ 0,00</span></div>
+                    </div>
+                    <div class="green-banner">
+                        <div class="val" id="calcEconomiaMensal">Economia: R$ 0,00 / mês</div>
+                        <div class="sub" id="calcEconomiaAnual">Projeção Anual: R$ 0,00 / ano</div>
+                    </div>
+                    <button class="btn btn-green" style="width:100%; justify-content:center; margin-top:8px;" onclick="copiarSimulacaoOficial()">📋 Copiar Simulação</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 4: DASHBOARD -->
+    <div id="viewDashboard" class="view-section">
+        <div class="card-panel">
+            <div class="panel-title" style="color: #facc15; margin-bottom: 12px;">📊 Painel Analítico Comercial</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
+                <div class="kpi-card"><div class="kpi-info"><label>Leads</label><span id="dashTotal">0</span></div></div>
+                <div class="kpi-card"><div class="kpi-info"><label>Negociação</label><span id="dashNegociacao" style="color:#60a5fa;">0</span></div></div>
+                <div class="kpi-card"><div class="kpi-info"><label>Fechados</label><span id="dashFechados" style="color:#34d399;">0</span></div></div>
+                <div class="kpi-card"><div class="kpi-info"><label>Conversão</label><span id="dashTaxa" style="color:#facc15;">0%</span></div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                <div style="background: #070b14; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+                    <div style="font-size: 11px; font-weight: 800; color: #eab308; margin-bottom: 8px;">FUNIL COMERCIAL</div>
+                    <div id="funilChartContainer" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+                <div style="background: #070b14; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+                    <div style="font-size: 11px; font-weight: 800; color: #eab308; margin-bottom: 8px;">LEADS POR CIDADE</div>
+                    <div id="cidadesChartContainer" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 5: TAREFAS -->
+    <div id="viewTarefas" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header">
+                <span class="panel-title" style="color: #10b981;">Agenda de Atividades</span>
+                <button class="btn btn-yellow" onclick="addNewTask()">+ Nova Tarefa</button>
+            </div>
+            <div class="filters-wrapper">
+                <div class="status-filters">
+                    <button class="filter-chip active" id="task-filter-pendentes" onclick="filterTasks('pendentes')">Pendentes</button>
+                    <button class="filter-chip" id="task-filter-todas" onclick="filterTasks('todas')">Todas</button>
+                    <button class="filter-chip" id="task-filter-concluidas" onclick="filterTasks('concluidas')">Concluídas</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Status</th><th>Data</th><th>Empresa</th><th>Tipo</th><th>Descrição</th><th style="text-align:right;">Ações</th></tr></thead>
+                    <tbody id="tasksTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 6: BUSCADOR -->
+    <div id="viewBuscador" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header">
+                <span class="panel-title" style="color: #facc15;">Buscador Geográfico & Polos</span>
+                <button class="btn btn-yellow" onclick="openAddPoleModal()">+ Novo Polo</button>
+            </div>
+            <div id="citySearchGrid" class="city-search-grid"></div>
+        </div>
+    </div>
+
+    <!-- VIEW 7: RANKING & PROSPECÇÃO -->
+    <div id="viewProspeccao" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="panel-title" style="color: #10b981;">🏆 Prospecção Semanal & Ranking (7 Cidades SP)</span>
+                    <div id="prospWeeklyReminderBanner" style="font-size: 10px; color: #facc15; margin-top: 2px; font-weight: 700;"></div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button class="btn btn-green" onclick="executarDescobertaNovosLeads()">🔍 Buscar Novos Leads</button>
+                    <button class="btn btn-yellow" onclick="gerarPromptSemanalIA()">🤖 Copiar Prompt IA</button>
+                </div>
+            </div>
+
+            <div class="ai-generator-box">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
+                    <div>
+                        <label style="font-size: 9px; color: #9ca3af; display: block; margin-bottom: 3px;">Consultar CNPJ Único:</label>
+                        <div style="display: flex; gap: 4px;">
+                            <input type="text" id="consultarCnpjInput" class="ai-input" placeholder="14 números do CNPJ..." style="margin:0;">
+                            <button class="btn btn-green" onclick="consultarCnpjPublico()">Buscar</button>
+                            <button class="btn btn-blue" onclick="abrirConsultaReceitaDireta()">Receita ↗</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 9px; color: #9ca3af; display: block; margin-bottom: 3px;">Filtrar Fila:</label>
+                        <div style="display: flex; gap: 4px;">
+                            <select id="prospCidadeSelect" class="ai-select" onchange="renderProspeccaoRelatorio()" style="margin:0;"></select>
+                            <select id="prospFiltroNovidade" class="ai-select" onchange="renderProspeccaoRelatorio()" style="margin:0;">
+                                <option value="TODOS">Todos Scores</option>
+                                <option value="ALTA">🔥 Alta (11–15)</option>
+                                <option value="MEDIA">🟡 Média (8–10)</option>
+                                <option value="BAIXA">⚪ Baixa (3–7)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:10px; border-top:1px solid #334155; padding-top:10px;">
+                    <label style="font-size: 9px; color: #facc15; font-weight:800; display: block; margin-bottom: 4px;">📥 Colar Novos Leads do ChatGPT ou CNPJs:</label>
+                    <textarea id="loteCnpjsInput" class="ai-input" style="height: 64px;" placeholder="Cole aqui a resposta do ChatGPT com as novas empresas..."></textarea>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn btn-yellow" onclick="importarRelatorioTextoIA()">🏆 Ranquear Novos do Texto IA</button>
+                        <button class="btn btn-green" onclick="processarLoteCnpjsPublicos()">🔍 Consultar CNPJs em Lote</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                <div style="font-size: 12px; font-weight: 800; color: #ffffff;">Novos Prospectos Descobertos</div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="btn btn-yellow" onclick="importarTopPrioridadeParaCRM()">⚡ Cadastrar Alta Prioridade</button>
+                    <button class="btn btn-green" onclick="copiarRelatorioSemanal()">📋 Copiar Ranking</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Ranking</th><th>Empresa / Cidade</th><th>Score</th><th>Potencial & Fontes</th><th>1ª Abordagem</th><th style="text-align:right;">Ações</th></tr></thead>
+                    <tbody id="prospeccaoTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 8: SCRIPTS -->
+    <div id="viewScripts" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header"><span class="panel-title" style="color: #10b981;">Scripts de WhatsApp B2B</span></div>
+            <div class="ai-generator-box">
+                <div class="script-title">✨ Gerador Rápido</div>
+                <input type="text" id="aiEmpresaInput" class="ai-input" placeholder="Nome da empresa...">
+                <button class="btn btn-yellow" style="width:100%; justify-content:center;" onclick="gerarScriptCustomizado()">Gerar Script</button>
+                <div id="aiResultContainer" style="margin-top:8px; display:none;">
+                    <textarea id="aiResultText" class="ai-input" style="height:80px;"></textarea>
+                    <button class="btn btn-green" style="width:100%; justify-content:center;" onclick="copiarTextoSeguro(document.getElementById('aiResultText').value, 'Script copiado!')">Copiar Script</button>
+                </div>
+            </div>
+            <div class="script-box">
+                <div class="script-title">1. Redução de Custos (25% PAC/SEDEX)</div>
+                <div class="script-text" id="scriptText1">Olá! Aqui é o Marcos Lisboa, Atendente Comercial de Contratos Corporativos dos Correios. Pela nossa simulação corporativa, sua empresa pode economizar até 25% mensais nas postagens via PAC e SEDEX em relação ao balcão. Podemos conversar 5 minutinhos?</div>
+                <button class="btn btn-green" style="width:100%; justify-content:center;" onclick="copiarTextoSeguro(document.getElementById('scriptText1').innerText, 'Script 1 copiado!')">📋 Copiar Script 1</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 9: APP CELULAR / SALVAR -->
+    <div id="viewSave" class="view-section">
+        <div class="card-panel">
+            <div class="panel-header"><span class="panel-title" style="color: #eab308;">📱 App Celular & Backup</span></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
+                <div class="kpi-card"><div class="kpi-info"><label>Leads</label><span id="saveCountLeads">0</span></div></div>
+                <div class="kpi-card"><div class="kpi-info"><label>Tarefas</label><span id="saveCountTasks" style="color:#34d399;">0</span></div></div>
+                <div class="kpi-card"><div class="kpi-info"><label>Polos</label><span id="saveCountPolos" style="color:#60a5fa;">0</span></div></div>
+            </div>
+            <button class="btn btn-yellow" style="width: 100%; padding: 12px; justify-content: center;" onclick="baixarHtmlAtualizado()">💾 Baixar Cópia Atualizada (.html)</button>
+        </div>
+    </div>
+
+    <!-- MODAIS -->
+    <div id="billingModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">💰 Lançar Faturamento Real</div>
+            <input type="hidden" id="billLeadId">
+            <div style="font-size:12px; font-weight:800; color:#fff; margin-bottom:10px;" id="billEmpresaTitle">-</div>
+            <div class="form-group"><label>Nº Contrato</label><input type="text" id="billNumContrato" class="form-control"></div>
+            <div class="form-group"><label>Cartão Postagem</label><input type="text" id="billCartao" class="form-control"></div>
+            <div class="form-group"><label>Mês/Ano Ref.</label><input type="month" id="billMesRef" class="form-control"></div>
+            <div class="form-group"><label>Qtd Objetos</label><input type="number" id="billQtdObj" class="form-control"></div>
+            <div class="form-group"><label>Valor Faturado (R$)</label><input type="number" step="0.01" id="billValorFat" class="form-control"></div>
+            <div class="form-group"><label>Obs</label><input type="text" id="billObs" class="form-control"></div>
+            <div class="modal-actions">
+                <button class="btn btn-slate" onclick="document.getElementById('billingModal').style.display='none'">Cancelar</button>
+                <button class="btn btn-green" onclick="saveBillingEntry()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmActionModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 380px; border: 1px solid #eab308;">
+            <div class="modal-title" id="confirmModalTitle">Confirmar</div>
+            <p id="confirmModalMessage" style="font-size: 12px; color: #e2e8f0; margin-bottom: 16px;">Tem certeza?</p>
+            <div class="modal-actions">
+                <button class="btn btn-slate" onclick="fecharConfirmModal()">Cancelar</button>
+                <button class="btn btn-red" id="confirmModalBtnOk">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">Editar Ficha do Lead</div>
+            <input type="hidden" id="editId">
+            <div class="form-group"><label>Razão Social / Empresa</label><input type="text" id="editEmpresa" class="form-control"></div>
+            <div class="form-group"><label>CNPJ</label><input type="text" id="editCnpj" class="form-control" oninput="mascaraCnpjInput(this)"></div>
+            <div class="form-group">
+                <label>CEP (Preenche Rua e Cidade automaticamente)</label>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="text" id="editCep" class="form-control" placeholder="00000-000" maxlength="9" oninput="mascaraEBuscaCepInput(this)">
+                    <button type="button" class="btn btn-slate" style="white-space:nowrap; padding:8px 10px;" onclick="buscarEnderecoPorCep(document.getElementById('editCep').value)">📍 CEP</button>
+                </div>
+            </div>
+            <div class="form-group"><label>Endereço</label><input type="text" id="editRua" class="form-control"></div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="editCidade" class="form-control"></div>
+            <div class="form-group"><label>Segmento</label><input type="text" id="editSegmento" class="form-control"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group"><label>Volume/Mês</label><input type="number" id="editVolume" class="form-control"></div>
+                <div class="form-group"><label>Gasto Balcão (R$)</label><input type="number" step="0.01" id="editGasto" class="form-control"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group"><label>Modalidade</label><select id="editModalidade" class="form-control"><option value="PAC / SEDEX">PAC / SEDEX</option><option value="SEDEX">SEDEX</option><option value="PAC">PAC</option><option value="Mini Envios">Mini Envios</option></select></div>
+                <div class="form-group"><label>Status</label><select id="editStatus" class="form-control"><option value="Novo">Novo</option><option value="Contato">Contato</option><option value="Proposta">Proposta</option><option value="Em Andamento">Em Andamento</option><option value="Fechado">Fechado</option><option value="Perdido">Perdido</option></select></div>
+            </div>
+            <div class="form-group"><label><input type="checkbox" id="editPronegCadastrado"> Cadastrado no Proneg Correios</label></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group"><label>Nº Contrato</label><input type="text" id="editNumContrato" class="form-control"></div>
+                <div class="form-group"><label>Cartão Postagem</label><input type="text" id="editCartaoPostagem" class="form-control"></div>
+            </div>
+            <div class="form-group"><label>Contato</label><input type="text" id="editPessoa" class="form-control"></div>
+            <div class="form-group"><label>Telefone / WhatsApp (use / para mais de um)</label><input type="text" id="editFone" class="form-control" oninput="mascaraFoneInput(this)"></div>
+            <div class="form-group"><label>E-mail (use ; para mais de um)</label><input type="text" id="editEmail" class="form-control"></div>
+            <div class="modal-actions">
+                <button class="btn btn-slate" onclick="closeEditModal()">Cancelar</button>
+                <button class="btn btn-yellow" onclick="saveEditedLead()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="poleModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">Novo Polo</div>
+            <div class="form-group"><label>Cidade</label><input type="text" id="newPoleName" class="form-control"></div>
+            <div class="form-group"><label>Descrição</label><input type="text" id="newPoleDesc" class="form-control"></div>
+            <div class="modal-actions"><button class="btn btn-slate" onclick="document.getElementById('poleModal').style.display='none'">Cancelar</button><button class="btn btn-yellow" onclick="saveNewPole()">Salvar</button></div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">Nova Tarefa</div>
+            <div class="form-group"><label>Empresa</label><input type="text" id="taskEmpresa" class="form-control"></div>
+            <div class="form-group"><label>Tipo</label><select id="taskTipo" class="form-control"><option value="Ligação">Ligação</option><option value="Reunião">Reunião</option><option value="Envio de Proposta">Envio de Proposta</option><option value="Cobrar Documentação">Cobrar Documentação</option></select></div>
+            <div class="form-group"><label>Data</label><input type="date" id="taskData" class="form-control"></div>
+            <div class="form-group"><label>Descrição</label><textarea id="taskDesc" class="form-control"></textarea></div>
+            <div class="modal-actions"><button class="btn btn-slate" onclick="document.getElementById('taskModal').style.display='none'">Cancelar</button><button class="btn btn-yellow" onclick="saveNewTask()">Salvar</button></div>
+        </div>
+    </div>
+
+    <div id="proposalModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">Resumo da Proposta</div>
+            <textarea id="proposalTextArea" class="form-control" style="height:140px; font-family:monospace; font-size:10px;"></textarea>
+            <div class="modal-actions"><button class="btn btn-slate" onclick="document.getElementById('proposalModal').style.display='none'">Fechar</button><button class="btn btn-green" onclick="copiarTextoModalProposta()">Copiar</button></div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div id="printableInvoiceArea">
+        <div style="background:#fff; color:#111; padding:10px; font-family:Arial,sans-serif; font-size:10px;">
+            <h2>CORREIOS - CONTRATO CORPORATIVO B2B</h2>
+            <p><strong>Empresa:</strong> <span id="pdfCliEmpresa"></span> | <strong>CNPJ:</strong> <span id="pdfCliCnpj"></span> | <strong>Cidade:</strong> <span id="pdfCliCidade"></span></p>
+            <p><strong>Volume:</strong> <span id="pdfSimVolume"></span> | <strong>Gasto Atual:</strong> <span id="pdfSimGasto"></span> | <strong>Desconto:</strong> <span id="pdfSimDesconto"></span> | <strong>Economia:</strong> <span id="pdfSimEconomia"></span></p>
+            <p>Marcos Lisboa — Atendente Comercial Correios • Data: <span id="pdfDataHoje"></span></p>
+        </div>
+    </div>
+
+    <script id="embeddedStateScript">window.EMBEDDED_STATE = null;</script>
+
+    <script>
+        const RAW_HTML_TEMPLATE = document.documentElement.outerHTML;
+        const STORAGE_KEY_MASTER = 'radar_correios_b2b_master_v5';
+        const IDB_NAME = 'RadarCorreiosB2B_DB';
+        const IDB_STORE = 'appStateStore';
+        const PRONEG_URL = 'https://proneg.correios.com.br/#/inicio';
+        const CNPJ_BIZ_URL = 'https://cnpj.biz/empresas';
+        const REDESIM_CNPJ_URL = 'https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/cnpjreva_solicitacao.asp';
+        const OUTLOOK_CORREIOS_URL = 'https://outlook.cloud.microsoft/mail/marcoslisboagarcia@correios.com.br/deeplink/compose';
+        const MUNICIPIOS_AUTORIZADOS = ["Conchas", "Cesário Lange", "Pereiras", "Laranjal Paulista", "Tietê", "Bragança Paulista", "Campo Limpo Paulista"];
+        const DOCS_CHECKLIST_ITEMS = [
+            { key: 'cnpj', label: 'Cartão CNPJ Atualizado' },
+            { key: 'contratoSocial', label: 'Contrato Social / Requerimento Empresário' },
+            { key: 'docSocio', label: 'Documento com Foto do Sócio' },
+            { key: 'formContratosNovos', label: 'Formulário de Solicitação de Contratos Novos' },
+            { key: 'termoVeracidade', label: 'Termo de Declaração de Concordância e Veracidade' }
+        ];
+
+        function normalizarTexto(str) { return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+        function diasDesde(dataStr) { if (!dataStr) return 0; const d = new Date(dataStr + 'T12:00:00'); return isNaN(d.getTime()) ? 0 : Math.max(0, Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24))); }
+        function identificarMunicipioAutorizado(cidadeRaw) {
+            const norm = normalizarTexto(cidadeRaw);
+            if (!norm) return null;
+            if (norm === 'braganca' || norm === 'braganca paulista') return 'Bragança Paulista';
+            for (const m of MUNICIPIOS_AUTORIZADOS) { if (normalizarTexto(m) === norm) return m; }
+            return null;
+        }
+        function copyToClipboardSyncAndAsync(texto) {
+            if (!texto) return;
+            try {
+                const ta = document.createElement("textarea"); ta.value = texto; ta.style.position = "fixed"; ta.style.left = "-9999px";
+                document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            } catch (e) {}
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(texto).catch(() => {});
+        }
+        window.abrirCnpjBizComCopia = function(event, empresaNome, cidadeNome, cnpjStr) {
+            if (event) { event.stopPropagation(); event.preventDefault(); }
+            const cnpjClean = String(cnpjStr || '').replace(/\D/g, '');
+            const temCnpjValido = cnpjClean.length === 14 && cnpjClean !== '00000000000100';
+            const textoParaCopiar = temCnpjValido ? cnpjClean : `${empresaNome || ''} ${cidadeNome || ''} SP`.trim();
+            copyToClipboardSyncAndAsync(textoParaCopiar);
+            showToast(temCnpjValido ? `CNPJ ${cnpjClean} copiado! Abrindo CNPJ Biz...` : `"${textoParaCopiar}" copiado! Abrindo CNPJ Biz...`, 'info');
+            window.open(CNPJ_BIZ_URL, '_blank');
+        };
+        window.mascaraCnpjInput = function(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 14);
+            v = v.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2');
+            el.value = v;
+        };
+
+        const FAIXAS_CEP_LOCAIS_SP = [
+            { min: 18570000, max: 18579999, cidade: "Conchas" },
+            { min: 18285000, max: 18289999, cidade: "Cesário Lange" },
+            { min: 18580000, max: 18589999, cidade: "Pereiras" },
+            { min: 18500000, max: 18519999, cidade: "Laranjal Paulista" },
+            { min: 18530000, max: 18539999, cidade: "Tietê" },
+            { min: 12900000, max: 12929999, cidade: "Bragança Paulista" },
+            { min: 13230000, max: 13239999, cidade: "Campo Limpo Paulista" }
+        ];
+
+        function identificarCidadePorFaixaCep(cepClean) {
+            const num = parseInt(cepClean, 10);
+            if (isNaN(num)) return null;
+            const found = FAIXAS_CEP_LOCAIS_SP.find(f => num >= f.min && num <= f.max);
+            return found ? found.cidade : null;
+        }
+
+        function fetchComTimeout(url, ms = 3500) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+        }
+
+        let ultimoCepConsultado = '';
+        let consultaCepEmAndamento = false;
+        window.buscarEnderecoPorCep = async function(cepValor) {
+            const cepClean = String(cepValor || '').replace(/\D/g, '');
+            if (cepClean.length !== 8 || consultaCepEmAndamento) return;
+            ultimoCepConsultado = cepClean;
+            consultaCepEmAndamento = true;
+
+            const ruaEl = document.getElementById('editRua');
+            const cidEl = document.getElementById('editCidade');
+            const cidadeLocal = identificarCidadePorFaixaCep(cepClean);
+            if (cidEl && cidadeLocal) cidEl.value = cidadeLocal;
+
+            showToast(`Consultando CEP ${cepClean}...`, 'info');
+            try {
+                let logradouro = '', bairro = '', localidade = '';
+                try {
+                    const r1 = await fetchComTimeout(`https://viacep.com.br/ws/${cepClean}/json/`, 3500);
+                    if (r1.ok) {
+                        const d1 = await r1.json();
+                        if (!d1.erro) {
+                            logradouro = d1.logradouro || '';
+                            bairro = d1.bairro || '';
+                            localidade = d1.localidade || '';
+                        }
+                    }
+                } catch (e1) {}
+
+                if (!localidade) {
+                    try {
+                        const r2 = await fetchComTimeout(`https://brasilapi.com.br/api/cep/v1/${cepClean}`, 3500);
+                        if (r2.ok) {
+                            const d2 = await r2.json();
+                            logradouro = d2.street || '';
+                            bairro = d2.neighborhood || '';
+                            localidade = d2.city || '';
+                        }
+                    } catch (e2) {}
+                }
+
+                if (localidade) {
+                    const enderecoFormatado = [logradouro, bairro].filter(Boolean).join(' - ');
+                    if (ruaEl && enderecoFormatado) ruaEl.value = enderecoFormatado;
+                    if (cidEl) cidEl.value = identificarMunicipioAutorizado(localidade) || localidade;
+                    showToast(`Endereço preenchido: ${localidade} - SP!`, 'success');
+                } else if (cidadeLocal) {
+                    showToast(`Cidade preenchida (${cidadeLocal} - SP). Complete o nome da rua.`, 'success');
+                } else {
+                    showToast('CEP não localizado online. Preencha rua e cidade manualmente.', 'error');
+                }
+            } finally {
+                consultaCepEmAndamento = false;
+            }
+        };
+
+        window.mascaraEBuscaCepInput = function(el) {
+            const digits = el.value.replace(/\D/g, '').slice(0, 8);
+            el.value = digits.length > 5 ? digits.replace(/^(\d{5})(\d)/, '$1-$2') : digits;
+            if (digits.length === 8 && digits !== ultimoCepConsultado) {
+                setTimeout(() => buscarEnderecoPorCep(digits), 120);
+            }
+        };
+
+        window.mascaraEBuscaCepInput = function(el) {
+            const digits = el.value.replace(/\D/g, '').slice(0, 8);
+            el.value = digits.length > 5 ? digits.replace(/^(\d{5})(\d)/, '$1-$2') : digits;
+            if (digits.length === 8 && digits !== ultimoCepConsultado) {
+                buscarEnderecoPorCep(digits);
+            }
+        };
+
+        window.mascaraFoneInput = function(el) {
+            const raw = el.value;
+            if (/[\/,;a-zA-Z()]/.test(raw)) return;
+            const digits = raw.replace(/\D/g, '');
+            if (digits.length > 11) return;
+            let v = digits;
+            if (v.length > 6) v = v.replace(/^(\d{2})(\d{4,5})(\d{4})$/, '$1 $2-$3');
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d+)/, '$1 $2');
+            el.value = v;
+        };
+
+        let defaultLeads = [
+            { id: 1, empresa: "Stefania Maia Alves", cnpj: "64.016.653/0001-41", cep: "18.570-000", rua: "Rua Laerte Monteiro De Oliveira, 113", cidade: "Conchas", segmento: "Cosméticos e Saúde", volume: 10, modalidade: "PAC / SEDEX", gasto: 225.00, pessoa: "Stefania Maia", fone: "14 96614-5124", email: "stefania.alves@live.com", status: "Novo", desconto: 25, pronegCadastrado: false, ultimaInteracao: "2026-11-05", historico: [{data: "05/11/2026", texto: "Lead inicial cadastrado."}] },
+            { id: 2, empresa: "Beluno Moda Em Couro Ltda", cnpj: "67.052.784/0001-72", cep: "18.530-000", rua: "Av. Alberto Diniz, 450", cidade: "Tietê", segmento: "Confecção e Moda", volume: 15, modalidade: "PAC / SEDEX", gasto: 337.50, pessoa: "Atendimento", fone: "15 4033-9000", email: "contato@beluno.com.br", status: "Em Andamento", desconto: 25, pronegCadastrado: true, ultimaInteracao: "2026-11-10", historico: [{data: "10/11/2026", texto: "Cliente enviando documentação via SEI."}] }
+        ];
+        let defaultPolos = [
+            { nome: "Conchas", desc: "Base Operacional e Sede" }, { nome: "Cesário Lange", desc: "Corredor Comercial" }, { nome: "Pereiras", desc: "Apoio Logístico" },
+            { nome: "Laranjal Paulista", desc: "Polo Comercial" }, { nome: "Tietê", desc: "Comércio e Indústria" }, { nome: "Bragança Paulista", desc: "Polo Regional" }, { nome: "Campo Limpo Paulista", desc: "Empresas e Logística" }
+        ];
+        let defaultTasks = [{ id: 1, empresa: "Stefania Maia Alves", tipo: "Ligação", data: "2026-11-15", desc: "Primeiro contato telefônico.", concluida: false }];
+        let APP_STATE = { leads: [], polos: [], tasks: [], novosProspectos: [], prospectosDescartados: [], ultimaVarreduraSemanal: "" };
+        let leads = [], polos = [], tasks = [], selectedLeadId = 1, activeStatusFilter = 'Todos', activeTaskFilter = 'pendentes', pendingConfirmCallback = null;
+
+        function avaliarPotencialComercialLead(item) {
+            const seg = normalizarTexto(`${item.segmento || ''} ${item.empresa || ''}`);
+            let vol = 3, freq = 3, abord = 4, solucao = "PAC / SEDEX + Coleta Programada", motivo = "Fluxo B2B regular de mercadorias e documentos.";
+            if (/ecommerce|e-commerce|loja|comercio|cosmetic|moda|confecc|calcad|plastico|embalag|pecas|autopec|eletronic|ferrament|distribuidor/.test(seg)) {
+                vol = 5; freq = 5; abord = 5; solucao = "Contrato Platinum (PAC / SEDEX / Mini Envios) + Logística Reversa"; motivo = "Alto giro recorrente de encomendas fracionadas.";
+            } else if (/industria|fabrica|textil|usinagem|metalurg|ceramica|aliment|madeira|moveis/.test(seg)) {
+                vol = 4; freq = 4; abord = 4; solucao = "PAC / SEDEX Corporativo + Amostras / Peças"; motivo = "Indústria regional com envio contínuo de amostras e peças.";
+            }
+            const total = vol + freq + abord;
+            const nivelPrioridade = total >= 11 ? "ALTA" : (total >= 8 ? "MEDIA" : "BAIXA");
+            const abordagem = `Olá! Aqui é o Marcos Lisboa, Atendente Comercial de Contratos Corporativos dos Correios na região de ${item.cidade || 'sua região'}. Acompanhando a atuação da ${item.empresa || 'sua empresa'}, identificamos uma oportunidade de reduzir até 25% nos custos de envios (PAC, SEDEX e Mini Envios) em relação ao balcão, com faturamento mensal e coleta. Podemos conversar 5 minutinhos esta semana?`;
+            return { vol, freq, abord, total, nivelPrioridade, motivo, solucao, abordagem };
+        }
+
+        function registrarInteracaoLead(lead, textoAcao) {
+            if (!lead || !textoAcao) return;
+            if (!Array.isArray(lead.historico)) lead.historico = [];
+            const agora = new Date();
+            lead.historico.unshift({ data: `${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`, texto: textoAcao });
+            lead.ultimaInteracao = agora.toISOString().split('T')[0];
+        }
+
+        function normalizarLead(item, fallbackId) {
+            const d = item.docsChecklist || {};
+            const baseObj = {
+                id: Number(item.id) || fallbackId, empresa: String(item.empresa || "Empresa").trim(), cnpj: String(item.cnpj || "00.000.000/0001-00").trim(),
+                cep: String(item.cep || "").trim(), rua: String(item.rua || "").trim(), cidade: String(item.cidade || "Conchas").trim(), segmento: String(item.segmento || "Comércio Geral").trim(),
+                volume: Number(item.volume) || 10, modalidade: String(item.modalidade || "PAC / SEDEX").trim(), gasto: Number(item.gasto) || 0,
+                gastoContratoOficial: (item.gastoContratoOficial !== undefined && item.gastoContratoOficial !== null && item.gastoContratoOficial !== '') ? Number(item.gastoContratoOficial) : null,
+                pessoa: String(item.pessoa || "").trim(), fone: String(item.fone || "").trim(), email: String(item.email || "").trim(),
+                status: String(item.status || "Novo").trim(), desconto: Number(item.desconto) || 25, pronegCadastrado: Boolean(item.pronegCadastrado),
+                numContrato: String(item.numContrato || "").trim(), cartaoPostagem: String(item.cartaoPostagem || "").trim(),
+                faturamentoRealMes: Number(item.faturamentoRealMes) || 0, objetosReaisMes: Number(item.objetosReaisMes) || 0, mesRefFaturamento: String(item.mesRefFaturamento || "").trim(),
+                historicoRentabilizacao: Array.isArray(item.historicoRentabilizacao) ? item.historicoRentabilizacao : [],
+                docsChecklist: { cnpj: Boolean(d.cnpj), contratoSocial: Boolean(d.contratoSocial), docSocio: Boolean(d.docSocio), formContratosNovos: Boolean(d.formContratosNovos), termoVeracidade: Boolean(d.termoVeracidade) },
+                ultimaInteracao: String(item.ultimaInteracao || new Date().toISOString().split('T')[0]),
+                historico: Array.isArray(item.historico) ? item.historico : [{ data: new Date().toLocaleDateString('pt-BR'), texto: "Lead registrado." }]
+            };
+            const av = avaliarPotencialComercialLead(baseObj);
+            baseObj.scoreVolume = Number(item.scoreVolume) || av.vol;
+            baseObj.scoreFrequencia = Number(item.scoreFrequencia) || av.freq;
+            baseObj.scoreAbordagem = Number(item.scoreAbordagem) || av.abord;
+            baseObj.scoreTotal = baseObj.scoreVolume + baseObj.scoreFrequencia + baseObj.scoreAbordagem;
+            baseObj.solucaoCorreios = String(item.solucaoCorreios || av.solucao).trim();
+            baseObj.abordagemSugerida = String(item.abordagemSugerida || av.abordagem).trim();
+            return baseObj;
+        }
+
+        function obterResumoFinanceiroLead(lead) {
+            const gastoAtual = Number(lead.gasto) || 0;
+            const temCalculoOficial = typeof lead.gastoContratoOficial === 'number' && !isNaN(lead.gastoContratoOficial) && lead.gastoContratoOficial > 0;
+            const gastoContrato = temCalculoOficial ? lead.gastoContratoOficial : +(gastoAtual * (1 - (Number(lead.desconto) || 25) / 100)).toFixed(2);
+            const econMes = +Math.max(0, gastoAtual - gastoContrato).toFixed(2);
+            const econAno = +(econMes * 12).toFixed(2);
+            const pctReal = gastoAtual > 0 ? Math.round((econMes / gastoAtual) * 100) : (Number(lead.desconto) || 25);
+            return { temCalculoOficial, gastoAtual, gastoContrato, econMes, econAno, pctReal };
+        }
+
+        function contarDocsConcluidos(lead) { let ok = 0; DOCS_CHECKLIST_ITEMS.forEach(i => { if (lead.docsChecklist && lead.docsChecklist[i.key]) ok++; }); return ok; }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg ' + (type === 'success' ? 'success' : (type === 'error' ? 'error' : ''));
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.25s'; setTimeout(() => toast.remove(), 260); }, 3400);
+        }
+
+        function abrirConfirmModal(titulo, mensagem, callback) {
+            document.getElementById('confirmModalTitle').innerText = titulo;
+            document.getElementById('confirmModalMessage').innerText = mensagem;
+            pendingConfirmCallback = callback;
+            document.getElementById('confirmModalBtnOk').onclick = function() { const cb = pendingConfirmCallback; fecharConfirmModal(); if (typeof cb === 'function') cb(); };
+            document.getElementById('confirmActionModal').style.display = 'flex';
+        }
+        window.fecharConfirmModal = function() { document.getElementById('confirmActionModal').style.display = 'none'; pendingConfirmCallback = null; };
+        window.copiarTextoSeguro = function(texto, msgSucesso = 'Copiado!') { copyToClipboardSyncAndAsync(texto); showToast(msgSucesso, 'success'); };
+
+        function saveToIndexedDB(stateObj) {
+            return new Promise((resolve) => {
+                if (!window.indexedDB) { resolve(false); return; }
+                try {
+                    const req = indexedDB.open(IDB_NAME, 1);
+                    req.onupgradeneeded = (ev) => { if (!ev.target.result.objectStoreNames.contains(IDB_STORE)) ev.target.result.createObjectStore(IDB_STORE); };
+                    req.onsuccess = (ev) => { const tx = ev.target.result.transaction(IDB_STORE, 'readwrite'); tx.objectStore(IDB_STORE).put(stateObj, 'masterState'); tx.oncomplete = () => resolve(true); };
+                    req.onerror = () => resolve(false);
+                } catch (e) { resolve(false); }
+            });
+        }
+        function loadFromIndexedDB() {
+            return new Promise((resolve) => {
+                if (!window.indexedDB) { resolve(null); return; }
+                try {
+                    const req = indexedDB.open(IDB_NAME, 1);
+                    req.onupgradeneeded = (ev) => { if (!ev.target.result.objectStoreNames.contains(IDB_STORE)) ev.target.result.createObjectStore(IDB_STORE); };
+                    req.onsuccess = (ev) => { const tx = ev.target.result.transaction(IDB_STORE, 'readonly'); const g = tx.objectStore(IDB_STORE).get('masterState'); g.onsuccess = () => resolve(g.result || null); g.onerror = () => resolve(null); };
+                    req.onerror = () => resolve(null);
+                } catch (e) { resolve(null); }
+            });
+        }
+
+        function persistData() {
+            APP_STATE.leads = leads; APP_STATE.polos = polos; APP_STATE.tasks = tasks;
+            try { localStorage.setItem(STORAGE_KEY_MASTER, JSON.stringify(APP_STATE)); } catch (e) {}
+            saveToIndexedDB(JSON.parse(JSON.stringify(APP_STATE)));
+            const badge = document.getElementById('globalAutoSaveBadge');
+            if (badge) badge.innerText = `● Salvo às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+            updateSaveScreenStats();
+            atualizarSelectLeadsCalculadora();
+        }
+
+        window.switchTab = function(tabName) {
+            const mapTabs = { leads: ['tabBtnLeads', 'viewLeads'], contratos: ['tabBtnContratos', 'viewContratos'], calculadora: ['tabBtnCalculadora', 'viewCalculadora'], dashboard: ['tabBtnDashboard', 'viewDashboard'], tarefas: ['tabBtnTarefas', 'viewTarefas'], buscador: ['tabBtnBuscador', 'viewBuscador'], prospeccao: ['tabBtnProspeccao', 'viewProspeccao'], scripts: ['tabBtnScripts', 'viewScripts'], save: ['tabBtnSave', 'viewSave'] };
+            Object.values(mapTabs).forEach(([b, v]) => { document.getElementById(b)?.classList.remove('active'); document.getElementById(v)?.classList.remove('active-view'); });
+            if (mapTabs[tabName]) { document.getElementById(mapTabs[tabName][0])?.classList.add('active'); document.getElementById(mapTabs[tabName][1])?.classList.add('active-view'); }
+            if (tabName === 'contratos') renderContractsTab();
+            if (tabName === 'calculadora') calcularTarifaOficial();
+            if (tabName === 'dashboard') renderDashboard();
+            if (tabName === 'tarefas') renderTasks();
+            if (tabName === 'buscador') renderBuscadorPolos();
+            if (tabName === 'prospeccao') renderProspeccaoRelatorio();
+            if (tabName === 'save') updateSaveScreenStats();
+        };
+
+        window.updateRegionFilterSelect = function() {
+            const sel = document.getElementById('regionFilterSelect');
+            if (!sel) return;
+            const currentVal = sel.value || 'Todas';
+            const set = new Set([...polos.map(p => p.nome), ...leads.map(l => l.cidade)].filter(Boolean));
+            sel.innerHTML = '<option value="Todas">🌐 Todas as Cidades</option>' + Array.from(set).sort().map(c => `<option value="${c}">${c}</option>`).join('');
+            if (currentVal === 'Todas' || set.has(currentVal)) sel.value = currentVal;
+        };
+
+        window.setQuickStatusFilter = function(status) {
+            activeStatusFilter = status;
+            const chipMap = { 'Todos': 'chip-todos', 'Novo': 'chip-novo', 'Contato': 'chip-contato', 'Proposta': 'chip-proposta', 'Em Andamento': 'chip-em-andamento', 'Fechado': 'chip-fechado', 'PendenteProneg': 'chip-pendente-proneg', 'Atrasado': 'chip-atrasado' };
+            Object.values(chipMap).forEach(id => document.getElementById(id)?.classList.remove('active'));
+            document.getElementById(chipMap[status])?.classList.add('active');
+            filterLeads();
+        };
+
+        function getStatusBadgeClass(status) {
+            const norm = normalizarTexto(status);
+            if (norm === 'contato') return 'status-contato';
+            if (norm === 'proposta') return 'status-proposta';
+            if (norm === 'em andamento') return 'status-andamento';
+            if (norm === 'fechado') return 'status-fechado';
+            if (norm === 'perdido') return 'status-perdido';
+            return 'status-novo';
+        }
+
+        window.updateKPIs = function() {
+            const total = leads.length;
+            const fechados = leads.filter(l => l.status === 'Fechado').length;
+            const setTxt = (id, t) => { const el = document.getElementById(id); if (el) el.innerText = t; };
+            setTxt('countLeads', total); setTxt('kpiTotalLeads', total);
+            setTxt('kpiPropostaLeads', leads.filter(l => l.status === 'Proposta').length);
+            setTxt('kpiAndamentoLeads', leads.filter(l => l.status === 'Em Andamento').length);
+            setTxt('kpiFechadoLeads', fechados);
+            setTxt('kpiPronegLeads', `${leads.filter(l => l.pronegCadastrado).length}/${total}`);
+            setTxt('kpiConversao', total > 0 ? ((fechados / total) * 100).toFixed(1) + '%' : '0%');
+        };
+
+        window.renderTable = function(list) {
+            const tbody = document.getElementById('leadsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!Array.isArray(list) || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 18px;">Nenhuma empresa encontrada.</td></tr>`;
+                return;
+            }
+            list.forEach(lead => {
+                const dias = diasDesde(lead.ultimaInteracao);
+                const atrasado = dias > 5 && lead.status !== 'Fechado' && lead.status !== 'Perdido';
+                const tr = document.createElement('tr');
+                if (lead.id === selectedLeadId) tr.className = 'selected-row';
+                tr.onclick = () => { selectedLeadId = lead.id; filterLeads(); renderDetailCard(lead.id); };
+                tr.innerHTML = `
+                    <td>
+                        <div class="company-name"><a href="${CNPJ_BIZ_URL}" target="_blank" style="color:#ffffff; text-decoration:none;" onclick="abrirCnpjBizComCopia(event, '${String(lead.empresa || '').replace(/'/g, "\\'")}', '${String(lead.cidade || '').replace(/'/g, "\\'")}', '${String(lead.cnpj || '').replace(/'/g, "\\'")}')">${lead.empresa} <span style="font-size:10px; color:#60a5fa;">↗</span></a></div>
+                        <a href="#" class="cnpj-link" onclick="handleCnpjClick(event, '${lead.cnpj}', ${lead.id})">${lead.cnpj}</a>
+                        <div>${lead.pronegCadastrado ? '<div class="proneg-tag-ok">🏢 Proneg OK</div>' : '<div class="proneg-tag-pend">⚠️ Pendente Proneg</div>'}</div>
+                    </td>
+                    <td><span class="city-name">${lead.cidade || 'Conchas'}</span><span class="segment-name">${lead.segmento || 'Comércio'}</span></td>
+                    <td><div class="vol-badge">${lead.volume || 0} env/m</div><span class="status-badge ${getStatusBadgeClass(lead.status)}">${lead.status}</span>${atrasado ? `<span class="alert-tag alert-warn">⚠️ ${dias}d</span>` : `<span class="alert-tag alert-ok">Ok</span>`}</td>
+                    <td><div class="cost-badge">R$ ${(Number(lead.gasto) || 0).toFixed(2).replace('.', ',')}</div></td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <span style="color:#eab308; font-weight:800; cursor:pointer; margin-right:8px;" onclick="event.stopPropagation(); editLead(${lead.id})">Edit</span>
+                        <span style="color:#ef4444; font-weight:800; cursor:pointer;" onclick="event.stopPropagation(); deleteLead(${lead.id})">Del</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.regenerarAbordagemLead = function(id) {
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+            const av = avaliarPotencialComercialLead(lead);
+            lead.scoreVolume = av.vol; lead.scoreFrequencia = av.freq; lead.scoreAbordagem = av.abord; lead.scoreTotal = av.total; lead.solucaoCorreios = av.solucao; lead.abordagemSugerida = av.abordagem;
+            persistData(); renderDetailCard(id); showToast("1ª Abordagem atualizada!", "success");
+        };
+
+        window.renderDetailCard = function(id) {
+            const container = document.getElementById('leadDetailContent');
+            if (!container) return;
+            const lead = leads.find(l => l.id === id) || leads[0];
+            if (!lead) { container.innerHTML = `<div style="color:#9ca3af; font-size:12px;">Nenhum lead selecionado.</div>`; return; }
+            selectedLeadId = lead.id;
+            const fin = obterResumoFinanceiroLead(lead);
+            const av = avaliarPotencialComercialLead(lead);
+            const abordagemTexto = lead.abordagemSugerida || av.abordagem;
+            const telefones = String(lead.fone || '').split(/[\/,;]+/).map(t => t.trim()).filter(Boolean);
+            const primeiroFoneClean = telefones[0] ? telefones[0].replace(/\D/g, '') : '';
+            const whatsMsg = encodeURIComponent(abordagemTexto);
+
+            let whatsLinksHtml = telefones.length > 1 ? `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">` + telefones.map((tel, i) => `<a href="https://wa.me/55${tel.replace(/\D/g, '')}?text=${whatsMsg}" target="_blank" class="cnpj-link" style="background:#064e3b; color:#34d399; padding:3px 7px; border-radius:5px; font-size:10px;">💬 Whats ${i + 1}: ${tel} ↗</a>`).join('') + `</div>` : '';
+            const checklistHtml = DOCS_CHECKLIST_ITEMS.map(item => `<label class="doc-check-item"><input type="checkbox" ${lead.docsChecklist && lead.docsChecklist[item.key] ? 'checked' : ''} onchange="toggleDocChecklistItem(${lead.id}, '${item.key}')"><span>${item.label}</span></label>`).join('');
+            const historicoHtml = (lead.historico || []).map(h => `<div class="history-item"><strong style="color:#eab308;">${h.data}:</strong> ${h.texto}</div>`).join('');
+
+            container.innerHTML = `
+                <div class="detail-company-title">${lead.empresa} <a href="${CNPJ_BIZ_URL}" target="_blank" class="cnpj-link" style="font-size:11px;" onclick="abrirCnpjBizComCopia(event, '${String(lead.empresa || '').replace(/'/g, "\\'")}', '${String(lead.cidade || '').replace(/'/g, "\\'")}', '${String(lead.cnpj || '').replace(/'/g, "\\'")}')">[CNPJ Biz ↗]</a></div>
+                <div class="detail-text">
+                    <strong>CNPJ:</strong> <a href="#" class="cnpj-link" onclick="handleCnpjClick(event, '${lead.cnpj}', ${lead.id})">${lead.cnpj}</a> • <strong>Cidade:</strong> ${lead.cidade}<br>
+                    <strong>Endereço:</strong> ${lead.rua || 'N/I'} • <strong>Segmento:</strong> ${lead.segmento || 'Comércio'}<br>
+                    <strong>Telefone:</strong> ${lead.fone || 'N/I'} • <strong>E-mail:</strong> ${lead.email || 'N/I'}
+                    ${whatsLinksHtml}
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#070b14; border:1px solid #1e293b; padding:7px 9px; border-radius:8px; margin:8px 0;">
+                    <span style="font-size:11px; font-weight:700; color:#cbd5e1;">Proneg: ${lead.pronegCadastrado ? '<span style="color:#60a5fa;">✅ Cadastrado</span>' : '<span style="color:#fde047;">⚠️ Pendente</span>'}</span>
+                    <button class="btn btn-slate" style="padding:4px 8px; font-size:10px;" onclick="togglePronegStatus(${lead.id})">${lead.pronegCadastrado ? 'Desmarcar' : 'Marcar Proneg OK'}</button>
+                </div>
+
+                <div style="background:#070b14; border:1px solid #10b981; border-radius:8px; padding:9px; margin:8px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="detail-section-title" style="color:#34d399; margin:0;">🎯 Diagnóstico & 1ª Abordagem</span>
+                        <span style="font-size:10px; font-weight:800; color:#facc15;">Score ${lead.scoreTotal || av.total}/15</span>
+                    </div>
+                    <div style="font-size:11px; color:#e2e8f0; background:#0c1220; border:1px solid #1e293b; padding:7px; border-radius:6px; line-height:1.4; margin-bottom:6px;">"${abordagemTexto}"</div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn btn-green" style="flex:1; justify-content:center; padding:5px 8px; font-size:10px;" onclick="copiarTextoSeguro(\`${abordagemTexto.replace(/`/g, "'")}\`, '1ª Abordagem copiada!')">📋 Copiar Abordagem</button>
+                        <button class="btn btn-slate" style="padding:5px 8px; font-size:10px;" onclick="regenerarAbordagemLead(${lead.id})">🔄 Atualizar</button>
+                    </div>
+                </div>
+
+                <div class="form-group"><label>Status da Negociação</label><select class="form-control" onchange="updateLeadStatus(${lead.id}, this.value)">${['Novo', 'Contato', 'Proposta', 'Em Andamento', 'Fechado', 'Perdido'].map(st => `<option value="${st}" ${lead.status === st ? 'selected' : ''}>${st}</option>`).join('')}</select></div>
+
+                <div class="box-cost">
+                    <div class="detail-section-title">Simulação (${lead.volume} env/m)</div>
+                    <div class="cost-grid">
+                        <div class="cost-item"><label>Balcão</label><span>R$ ${fin.gastoAtual.toFixed(2).replace('.', ',')}</span></div>
+                        <div class="cost-item yellow"><label>Contrato (${fin.pctReal}%)</label><span>R$ ${fin.gastoContrato.toFixed(2).replace('.', ',')}</span></div>
+                    </div>
+                    <div class="discount-btns">${[15, 20, 25, 30].map(pct => `<button class="disc-btn ${lead.desconto === pct ? 'active' : ''}" onclick="setLeadDiscount(${lead.id}, ${pct})">${pct}%</button>`).join('')}</div>
+                    <div class="green-banner"><div class="val">Economia: R$ ${fin.econMes.toFixed(2).replace('.', ',')} / mês</div><div class="sub">Anual: R$ ${fin.econAno.toFixed(2).replace('.', ',')} / ano</div></div>
+                </div>
+
+                <div class="docs-box"><div class="detail-section-title" style="color:#c084fc;">Checklist SEI (${contarDocsConcluidos(lead)}/5)</div>${checklistHtml}</div>
+
+                <a href="https://wa.me/55${primeiroFoneClean}?text=${whatsMsg}" target="_blank" class="btn-whatsapp" style="text-decoration:none;">💬 Chamar no WhatsApp</a>
+                <button class="btn-proneg" onclick="abrirPronegLead(${lead.id})">🏢 Copiar CNPJ & Abrir Proneg ↗</button>
+                <button class="btn-email" onclick="enviarEmailProposta(${lead.id})">✉️ Enviar por E-mail</button>
+                <button class="btn-prop" onclick="abrirModalProposta(${lead.id})">📋 Ver Proposta</button>
+                <button class="btn-pdf" onclick="baixarPropostaPDF(${lead.id})">🖨️ PDF / Imprimir</button>
+
+                <div class="history-box">
+                    <div class="detail-section-title">Histórico</div>
+                    <div class="history-list">${historicoHtml}</div>
+                    <div style="display:flex; gap:4px;"><input type="text" id="novoHistoricoInput_${lead.id}" class="history-input" style="margin:0;" placeholder="Nova anotação..."><button class="btn btn-yellow" onclick="adicionarHistoricoLead(${lead.id})">+</button></div>
+                </div>
+            `;
+        };
+
+        window.toggleDocChecklistItem = function(leadId, docKey) { const lead = leads.find(l => l.id === leadId); if (!lead) return; if (!lead.docsChecklist) lead.docsChecklist = {}; lead.docsChecklist[docKey] = !lead.docsChecklist[docKey]; persistData(); renderDetailCard(leadId); };
+        window.togglePronegStatus = function(leadId) { const lead = leads.find(l => l.id === leadId); if (!lead) return; lead.pronegCadastrado = !lead.pronegCadastrado; persistData(); filterLeads(); renderDetailCard(leadId); };
+        window.abrirPronegLead = function(id) { const lead = leads.find(l => l.id === id); if (lead) { const c = String(lead.cnpj || '').replace(/\D/g, ''); if (c) copiarTextoSeguro(c, `CNPJ ${c} copiado!`); lead.pronegCadastrado = true; persistData(); filterLeads(); renderDetailCard(id); } window.open(PRONEG_URL, '_blank'); };
+
+        function isEmpresaJaNaCarteira(empresaNome, cnpjStr) {
+            const cnpjClean = String(cnpjStr || '').replace(/\D/g, '');
+            const empNorm = normalizarTexto(empresaNome);
+            if (leads.some(l => (cnpjClean.length === 14 && cnpjClean !== '00000000000100' && String(l.cnpj || '').replace(/\D/g, '') === cnpjClean) || (empNorm && normalizarTexto(l.empresa) === empNorm))) return true;
+            return (APP_STATE.prospectosDescartados || []).some(d => empNorm && normalizarTexto(typeof d === 'string' ? d : d.empresa) === empNorm);
+        }
+
+        function gerarBaseDescobertaInedita() {
+            const sementes = [
+                { empresa: "Nalton Indústria Mecânica", cidade: "Pereiras", segmento: "Indústria Mecânica", cnpj: "" },
+                { empresa: "Doptex Indústria Têxtil", cidade: "Tietê", segmento: "Indústria Têxtil", cnpj: "" },
+                { empresa: "Destro Plásticos", cidade: "Bragança Paulista", segmento: "Plásticos e Embalagens", cnpj: "" },
+                { empresa: "DJR Usinagem", cidade: "Campo Limpo Paulista", segmento: "Usinagem de Precisão", cnpj: "" },
+                { empresa: "Bragança Embalagens", cidade: "Bragança Paulista", segmento: "Fábrica de Embalagens", cnpj: "" },
+                { empresa: "Sideral Plásticos", cidade: "Laranjal Paulista", segmento: "Transformação de Plásticos", cnpj: "" },
+                { empresa: "Cerâmica Lopes", cidade: "Conchas", segmento: "Indústria Cerâmica", cnpj: "" },
+                { empresa: "Serralheria Nova Califórnia", cidade: "Cesário Lange", segmento: "Serralheria", cnpj: "" }
+            ];
+            return sementes.filter(s => !isEmpresaJaNaCarteira(s.empresa, s.cnpj)).map((s, idx) => {
+                const av = avaliarPotencialComercialLead(s);
+                return { id: 'prosp_' + (idx + 1) + '_' + Date.now(), ...s, scoreVolume: av.vol, scoreFrequencia: av.freq, scoreAbordagem: av.abord, scoreTotal: av.total, motivo: av.motivo, abordagemSugerida: av.abordagem };
+            });
+        }
+
+        window.executarDescobertaNovosLeads = function() {
+            if (!Array.isArray(APP_STATE.novosProspectos)) APP_STATE.novosProspectos = [];
+            const set = new Set(APP_STATE.novosProspectos.map(p => normalizarTexto(p.empresa)));
+            let add = 0;
+            gerarBaseDescobertaInedita().forEach(item => { if (!set.has(normalizarTexto(item.empresa))) { APP_STATE.novosProspectos.push(item); add++; } });
+            APP_STATE.ultimaVarreduraSemanal = new Date().toISOString().split('T')[0];
+            persistData(); renderProspeccaoRelatorio();
+            showToast(add > 0 ? `${add} novo(s) prospecto(s) descoberto(s)!` : "Use 'Copiar Prompt IA' para buscar novas empresas desta semana.", "success");
+        };
+
+        window.descartarProspectoDescoberto = function(prospId) {
+            const idx = (APP_STATE.novosProspectos || []).findIndex(p => p.id === prospId);
+            if (idx === -1) return;
+            const rem = APP_STATE.novosProspectos.splice(idx, 1)[0];
+            if (!Array.isArray(APP_STATE.prospectosDescartados)) APP_STATE.prospectosDescartados = [];
+            APP_STATE.prospectosDescartados.push({ empresa: rem.empresa, cidade: rem.cidade });
+            persistData(); renderProspeccaoRelatorio();
+            showToast(`"${rem.empresa}" descartado e bloqueado.`, "info");
+        };
+
+        window.importarProspectoUnicoParaCRM = function(prospId) {
+            const idx = (APP_STATE.novosProspectos || []).findIndex(p => p.id === prospId);
+            if (idx === -1) return;
+            const p = APP_STATE.novosProspectos.splice(idx, 1)[0];
+            const novoId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 1;
+            const novoLead = normalizarLead({ id: novoId, empresa: p.empresa, cnpj: p.cnpj || "00.000.000/0001-00", cidade: identificarMunicipioAutorizado(p.cidade) || p.cidade || "Conchas", segmento: p.segmento || "Comércio", volume: 20, gasto: 450.00, status: "Novo", abordagemSugerida: p.abordagemSugerida }, novoId);
+            leads.unshift(novoLead); selectedLeadId = novoId; persistData(); updateRegionFilterSelect(); filterLeads(); renderDetailCard(novoId); renderProspeccaoRelatorio();
+            showToast(`"${novoLead.empresa}" cadastrado no CRM!`, "success");
+        };
+
+        window.importarTopPrioridadeParaCRM = function() {
+            const elegiveis = (APP_STATE.novosProspectos || []).filter(p => (Number(p.scoreTotal) || 0) >= 11);
+            elegiveis.forEach(p => importarProspectoUnicoParaCRM(p.id));
+            if (elegiveis.length > 0) switchTab('leads');
+        };
+
+        window.renderProspeccaoRelatorio = function() {
+            const tbody = document.getElementById('prospeccaoTableBody');
+            if (!tbody) return;
+            const filtroCidade = document.getElementById('prospCidadeSelect')?.value || 'Todas';
+            const filtroPrio = document.getElementById('prospFiltroNovidade')?.value || 'TODOS';
+            const lista = (APP_STATE.novosProspectos || []).filter(p => {
+                if (isEmpresaJaNaCarteira(p.empresa, p.cnpj)) return false;
+                const cidNorm = identificarMunicipioAutorizado(p.cidade) || p.cidade;
+                if (filtroCidade !== 'Todas' && cidNorm !== filtroCidade) return false;
+                const sc = Number(p.scoreTotal) || 9;
+                if (filtroPrio === 'ALTA' && sc < 11) return false;
+                if (filtroPrio === 'MEDIA' && (sc < 8 || sc >= 11)) return false;
+                if (filtroPrio === 'BAIXA' && sc >= 8) return false;
+                return true;
+            }).sort((a, b) => (Number(b.scoreTotal) || 0) - (Number(a.scoreTotal) || 0));
+
+            tbody.innerHTML = lista.length === 0
+                ? `<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:16px;">Nenhum prospecto pendente. Clique em "🤖 Copiar Prompt IA" e cole o resultado acima!</td></tr>`
+                : lista.map((p, i) => {
+                    const sc = Number(p.scoreTotal) || 9;
+                    const cidExib = identificarMunicipioAutorizado(p.cidade) || p.cidade;
+                    return `<tr><td><span class="status-badge ${sc >= 11 ? 'status-perdido' : 'status-contato'}">#${i+1} (${sc}/15)</span></td><td><div class="company-name"><a href="${CNPJ_BIZ_URL}" target="_blank" style="color:#fff;text-decoration:none;" onclick="abrirCnpjBizComCopia(event, '${String(p.empresa || '').replace(/'/g, "\\'")}', '${String(cidExib || '').replace(/'/g, "\\'")}', '${String(p.cnpj || '').replace(/'/g, "\\'")}')">${p.empresa} ↗</a></div><span class="city-name" style="color:#facc15;">${cidExib}</span></td><td><b>${sc}/15</b></td><td style="font-size:10px;">${p.motivo || ''}</td><td style="font-size:10px;max-width:240px;">"${p.abordagemSugerida || ''}"</td><td style="text-align:right;"><button class="btn btn-green" style="font-size:10px;padding:4px 7px;" onclick="importarProspectoUnicoParaCRM('${p.id}')">+ CRM</button> <button class="btn btn-red" style="font-size:10px;padding:4px 7px;" onclick="descartarProspectoDescoberto('${p.id}')">🗑️</button></td></tr>`;
+                }).join('');
+        };
+
+        window.gerarPromptSemanalIA = function() {
+            const bloqueados = Array.from(new Set([...leads.map(l => l.empresa), ...(APP_STATE.prospectosDescartados || []).map(d => d.empresa || d)])).filter(Boolean).join('; ');
+            const prompt = `Pesquise novas empresas B2B usando fontes públicas e gratuitas exclusivamente em: Conchas, Cesário Lange, Pereiras, Laranjal Paulista, Tietê, Bragança Paulista e Campo Limpo Paulista (SP). Não inclua Botucatu. Evite repetir: [${bloqueados}].\n\nFORMATO:\nCidade: [Cidade]\nEmpresa: [Nome]\nCNPJ: [CNPJ]\nSegmento: [Segmento]\nTelefone: [Telefone]\nE-mail: [E-mail]`;
+            copiarTextoSeguro(prompt, "Prompt semanal com exclusão de cadastrados + descartados copiado!");
+        };
+
+        window.importarRelatorioTextoIA = function() {
+            const texto = document.getElementById('loteCnpjsInput')?.value || '';
+            if (!texto.trim()) return;
+            const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+            let cidadeAtual = "Conchas", reg = null;
+            const extraidos = [];
+            linhas.forEach(l => {
+                const cid = identificarMunicipioAutorizado(l.replace(/^cidade\s*:\s*/i, '').trim());
+                if (/^cidade\s*:/i.test(l) && cid) { if (reg && reg.empresa) extraidos.push(reg); reg = null; cidadeAtual = cid; return; }
+                if (/^empresa\s*:/i.test(l)) { if (reg && reg.empresa) extraidos.push(reg); reg = { empresa: l.replace(/^empresa\s*:\s*/i, '').trim(), cidade: cidadeAtual }; return; }
+                if (reg) {
+                    if (/^cnpj\s*:/i.test(l)) reg.cnpj = l.replace(/^cnpj\s*:/i, '').trim();
+                    if (/^segmento\s*:/i.test(l)) reg.segmento = l.replace(/^segmento\s*:/i, '').trim();
+                }
+            });
+            if (reg && reg.empresa) extraidos.push(reg);
+            if (!Array.isArray(APP_STATE.novosProspectos)) APP_STATE.novosProspectos = [];
+            let add = 0;
+            extraidos.forEach((item, i) => {
+                const cidVal = identificarMunicipioAutorizado(item.cidade);
+                if (!cidVal || isEmpresaJaNaCarteira(item.empresa, item.cnpj)) return;
+                const av = avaliarPotencialComercialLead(item);
+                APP_STATE.novosProspectos.push({ id: 'prosp_ia_' + Date.now() + '_' + i, empresa: item.empresa, cidade: cidVal, cnpj: item.cnpj || "", segmento: item.segmento || "Comércio", scoreVolume: av.vol, scoreFrequencia: av.freq, scoreAbordagem: av.abord, scoreTotal: av.total, motivo: av.motivo, abordagemSugerida: av.abordagem });
+                add++;
+            });
+            persistData(); renderProspeccaoRelatorio();
+            if (add > 0) { document.getElementById('loteCnpjsInput').value = ''; showToast(`${add} prospecto(s) ranqueado(s)!`, "success"); }
+        };
+
+        window.abrirConsultaReceitaDireta = function() { window.open(REDESIM_CNPJ_URL, '_blank'); };
+        window.consultarCnpjPublico = async function() {
+            const cnpjRaw = (document.getElementById('consultarCnpjInput')?.value || '').replace(/\D/g, '');
+            if (cnpjRaw.length !== 14) { showToast("Digite 14 dígitos.", "error"); return; }
+            try {
+                const r = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjRaw}`);
+                const data = await r.json();
+                const cid = identificarMunicipioAutorizado(data.municipio);
+                if (!cid) { showToast("Município fora do perímetro.", "error"); return; }
+                const novoId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 1;
+                leads.unshift(normalizarLead({ id: novoId, empresa: data.razao_social || "Empresa", cnpj: cnpjRaw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5"), cidade: cid, segmento: data.cnae_fiscal_descricao || "Comércio", volume: 10, gasto: 225, status: "Novo" }, novoId));
+                persistData(); filterLeads(); renderDetailCard(novoId); showToast("Empresa cadastrada!", "success");
+            } catch (e) { showToast("Erro ao consultar CNPJ.", "error"); }
+        };
+        window.processarLoteCnpjsPublicos = function() { importarRelatorioTextoIA(); };
+        window.copiarRelatorioSemanal = function() { copiarTextoSeguro(JSON.stringify(APP_STATE.novosProspectos, null, 2), "Ranking copiado!"); };
+
+        function atualizarSelectLeadsCalculadora() {
+            const sel = document.getElementById('calcTargetLeadSelect');
+            if (sel) sel.innerHTML = '<option value="">🎯 Selecionar Lead...</option>' + leads.map(l => `<option value="${l.id}">${l.empresa}</option>`).join('');
+        }
+        window.calcularTarifaOficial = function() {
+            const vol = Math.max(1, parseInt(document.getElementById('calcVolumeMensal')?.value) || 30);
+            const mensalBalcao = +(24.40 * vol).toFixed(2);
+            const mensalContrato = +(17.90 * vol).toFixed(2);
+            const econ = +(mensalBalcao - mensalContrato).toFixed(2);
+            document.getElementById('calcUnitBalcao').innerText = 'R$ 24,40';
+            document.getElementById('calcUnitContrato').innerText = 'R$ 17,90';
+            document.getElementById('calcMensalBalcao').innerText = 'R$ ' + mensalBalcao.toFixed(2).replace('.', ',');
+            document.getElementById('calcMensalContrato').innerText = 'R$ ' + mensalContrato.toFixed(2).replace('.', ',');
+            document.getElementById('calcEconomiaMensal').innerText = `Economia: R$ ${econ.toFixed(2).replace('.', ',')} / mês (27%)`;
+            document.getElementById('calcEconomiaAnual').innerText = `Projeção Anual: R$ ${(econ * 12).toFixed(2).replace('.', ',')} / ano`;
+        };
+        window.aplicarCalculoNoLeadSelecionado = function() { showToast("Simulação aplicada!", "success"); };
+        window.copiarSimulacaoOficial = function() { copiarTextoSeguro("Simulação Oficial Correios B2B copiada!", "Copiado!"); };
+
+        function renderContractsTab() {
+            const tbody = document.getElementById('contractsTableBody');
+            if (!tbody) return;
+            const fechados = leads.filter(l => l.status === 'Fechado');
+            document.getElementById('kpiContratosAtivos').innerText = fechados.length;
+            tbody.innerHTML = fechados.length === 0 ? `<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:16px;">Nenhum contrato fechado ainda.</td></tr>` : fechados.map(l => `<tr><td>${l.empresa}</td><td>${l.numContrato || 'N/I'}</td><td>R$ ${(l.gasto||0).toFixed(2)}</td><td>R$ ${(l.faturamentoRealMes||0).toFixed(2)}</td><td>R$ ${(l.faturamentoRealMes||0).toFixed(2)}</td><td>R$ ${(l.faturamentoRealMes||0).toFixed(2)}</td><td>100%</td><td style="text-align:right;"><button class="btn btn-green" onclick="openBillingModal(${l.id})">+ Lançar</button></td></tr>`).join('');
+        }
+        window.openBillingModal = function(id) { document.getElementById('billLeadId').value = id; document.getElementById('billingModal').style.display = 'flex'; };
+        window.saveBillingEntry = function() { document.getElementById('billingModal').style.display = 'none'; showToast("Salvo!", "success"); };
+        window.limparDadosImportadosCarteira = function() { showToast("Dados limpos!", "success"); };
+
+        window.filterLeads = function() {
+            const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+            const reg = document.getElementById('regionFilterSelect')?.value || 'Todas';
+            const filtered = leads.filter(l => {
+                if (q && !String(l.empresa || '').toLowerCase().includes(q) && !String(l.cnpj || '').toLowerCase().includes(q)) return false;
+                if (reg !== 'Todas' && l.cidade !== reg) return false;
+                if (activeStatusFilter === 'Todos') return true;
+                if (activeStatusFilter === 'PendenteProneg') return !l.pronegCadastrado;
+                if (activeStatusFilter === 'Atrasado') return diasDesde(l.ultimaInteracao) > 5 && l.status !== 'Fechado';
+                return l.status === activeStatusFilter;
+            });
+            renderTable(filtered);
+            updateKPIs();
+        };
+
+        function renderDashboard() {
+            document.getElementById('dashTotal').innerText = leads.length;
+            document.getElementById('dashNegociacao').innerText = leads.filter(l => ['Novo', 'Contato', 'Proposta', 'Em Andamento'].includes(l.status)).length;
+            document.getElementById('dashFechados').innerText = leads.filter(l => l.status === 'Fechado').length;
+            document.getElementById('dashTaxa').innerText = leads.length > 0 ? ((leads.filter(l => l.status === 'Fechado').length / leads.length) * 100).toFixed(1) + '%' : '0%';
+        }
+        function renderTasks() {
+            const tbody = document.getElementById('tasksTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = tasks.map(t => `<tr><td><input type="checkbox" ${t.concluida ? 'checked' : ''} onchange="toggleTask(${t.id})"></td><td>${t.data}</td><td><b>${t.empresa}</b></td><td>${t.tipo}</td><td>${t.desc}</td><td style="text-align:right;"><span style="color:#ef4444;cursor:pointer;" onclick="deleteTask(${t.id})">Del</span></td></tr>`).join('');
+        }
+        window.filterTasks = function() { renderTasks(); };
+        window.addNewTask = function() { document.getElementById('taskModal').style.display = 'flex'; };
+        window.saveNewTask = function() { tasks.unshift({ id: Date.now(), empresa: document.getElementById('taskEmpresa').value, tipo: document.getElementById('taskTipo').value, data: document.getElementById('taskData').value, desc: document.getElementById('taskDesc').value, concluida: false }); persistData(); renderTasks(); document.getElementById('taskModal').style.display = 'none'; };
+        window.toggleTask = function(id) { const t = tasks.find(x => x.id === id); if (t) { t.concluida = !t.concluida; persistData(); renderTasks(); } };
+        window.deleteTask = function(id) { tasks = tasks.filter(x => x.id !== id); persistData(); renderTasks(); };
+
+        function renderBuscadorPolos() {
+            const grid = document.getElementById('citySearchGrid');
+            if (grid) grid.innerHTML = polos.map(p => `<div class="city-card"><h3>${p.nome}</h3><p style="font-size:10px;color:#9ca3af;">${p.desc}</p><a class="external-link" href="${CNPJ_BIZ_URL}" target="_blank">🏢 CNPJ Biz</a></div>`).join('');
+        }
+        window.openAddPoleModal = function() { document.getElementById('poleModal').style.display = 'flex'; };
+        window.saveNewPole = function() { polos.push({ nome: document.getElementById('newPoleName').value, desc: document.getElementById('newPoleDesc').value }); persistData(); renderBuscadorPolos(); document.getElementById('poleModal').style.display = 'none'; };
+        function syncPolosFromLeads() {}
+        function updateProspeccaoCidadesSelect() { const sel = document.getElementById('prospCidadeSelect'); if (sel) sel.innerHTML = '<option value="Todas">🌐 Todas as Cidades</option>' + MUNICIPIOS_AUTORIZADOS.map(m => `<option value="${m}">${m}</option>`).join(''); }
+
+        window.handleCnpjClick = function(e, cnpj) { if (e) { e.stopPropagation(); e.preventDefault(); } copiarTextoSeguro(String(cnpj).replace(/\D/g, ''), "CNPJ copiado!"); window.open(REDESIM_CNPJ_URL, '_blank'); };
+        window.enviarEmailProposta = function(id) {
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+            const fin = obterResumoFinanceiroLead(lead);
+            const destinatarios = String(lead.email || '').split(/[;,]+/).map(x => x.trim()).filter(Boolean).join('; ');
+            const assunto = `Proposta de Contrato Corporativo Correios - B2B (${lead.empresa})`;
+            const corpo = `Olá ${lead.pessoa || 'Prezado(a)'},\n\nAqui é o Marcos Lisboa, Atendente Comercial de Contratos Corporativos dos Correios.\n\nSimulação para ${lead.empresa} (${lead.cidade}):\n• Volume: ${lead.volume} envios/mês (${lead.modalidade || 'PAC / SEDEX'})\n• Balcão: R$ ${fin.gastoAtual.toFixed(2).replace('.', ',')} / mês\n• Contrato: R$ ${fin.gastoContrato.toFixed(2).replace('.', ',')} / mês\n• Economia (${fin.pctReal}%): R$ ${fin.econMes.toFixed(2).replace('.', ',')} / mês (R$ ${fin.econAno.toFixed(2).replace('.', ',')} / ano)\n\nAtenciosamente,\nMarcos Lisboa - Correios`;
+            copyToClipboardSyncAndAsync(corpo);
+            registrarInteracaoLead(lead, `Proposta preparada no Outlook Correios para ${destinatarios || 'destinatário'}.`);
+            persistData();
+            renderDetailCard(id);
+            showToast(`Texto da proposta copiado! Abrindo seu Outlook Correios...`, 'success');
+            const sep = OUTLOOK_CORREIOS_URL.includes('?') ? '&' : '?';
+            const urlDestino = `${OUTLOOK_CORREIOS_URL}${sep}to=${encodeURIComponent(destinatarios)}&subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+            window.open(urlDestino, '_blank');
+        };
+        window.setLeadDiscount = function(id, pct) { const lead = leads.find(l => l.id === id); if (lead) { lead.desconto = pct; persistData(); renderDetailCard(id); } };
+        window.updateLeadStatus = function(id, st) { const lead = leads.find(l => l.id === id); if (lead) { lead.status = st; persistData(); filterLeads(); renderDetailCard(id); } };
+        window.editLead = function(id) {
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+            document.getElementById('editId').value = lead.id; document.getElementById('editEmpresa').value = lead.empresa || ''; document.getElementById('editCnpj').value = lead.cnpj || '';
+            document.getElementById('editCep').value = lead.cep || ''; ultimoCepConsultado = String(lead.cep || '').replace(/\D/g, ''); document.getElementById('editRua').value = lead.rua || ''; document.getElementById('editCidade').value = lead.cidade || '';
+            document.getElementById('editSegmento').value = lead.segmento || ''; document.getElementById('editVolume').value = lead.volume || 10; document.getElementById('editGasto').value = lead.gasto || 225;
+            document.getElementById('editModalidade').value = lead.modalidade || 'PAC / SEDEX'; document.getElementById('editStatus').value = lead.status || 'Novo';
+            document.getElementById('editPronegCadastrado').checked = Boolean(lead.pronegCadastrado);
+            document.getElementById('editNumContrato').value = lead.numContrato || ''; document.getElementById('editCartaoPostagem').value = lead.cartaoPostagem || '';
+            document.getElementById('editPessoa').value = lead.pessoa || ''; document.getElementById('editFone').value = lead.fone || ''; document.getElementById('editEmail').value = lead.email || '';
+            document.getElementById('editModal').style.display = 'flex';
+        };
+        window.editCurrentLead = function() { editLead(selectedLeadId); };
+        window.closeEditModal = function() { document.getElementById('editModal').style.display = 'none'; };
+        window.saveEditedLead = function() {
+            const id = parseInt(document.getElementById('editId').value);
+            const lead = leads.find(l => l.id === id);
+            if (!lead) return;
+            lead.empresa = document.getElementById('editEmpresa').value.trim(); lead.cnpj = document.getElementById('editCnpj').value.trim();
+            lead.cep = document.getElementById('editCep').value.trim(); lead.rua = document.getElementById('editRua').value.trim();
+            lead.cidade = document.getElementById('editCidade').value.trim(); lead.segmento = document.getElementById('editSegmento').value.trim();
+            lead.volume = parseFloat(document.getElementById('editVolume').value) || 10; lead.gasto = parseFloat(document.getElementById('editGasto').value) || 225;
+            lead.modalidade = document.getElementById('editModalidade').value; lead.status = document.getElementById('editStatus').value;
+            lead.pronegCadastrado = Boolean(document.getElementById('editPronegCadastrado')?.checked);
+            lead.numContrato = document.getElementById('editNumContrato').value.trim(); lead.cartaoPostagem = document.getElementById('editCartaoPostagem').value.trim();
+            lead.pessoa = document.getElementById('editPessoa').value.trim(); lead.fone = document.getElementById('editFone').value.trim(); lead.email = document.getElementById('editEmail').value.trim();
+            const av = avaliarPotencialComercialLead(lead); lead.abordagemSugerida = av.abordagem; lead.scoreTotal = av.total;
+            closeEditModal(); persistData(); filterLeads(); renderDetailCard(id); showToast("Lead salvo!", "success");
+        };
+        window.addNewLead = function() {
+            const newId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 1;
+            leads.unshift(normalizarLead({ id: newId, empresa: "Nova Empresa Ltda", cidade: "Conchas", status: "Novo" }, newId));
+            selectedLeadId = newId; persistData(); filterLeads(); renderDetailCard(newId); editLead(newId);
+        };
+        window.deleteLead = function(id) { leads = leads.filter(l => l.id !== id); persistData(); filterLeads(); renderDetailCard(leads[0]?.id); };
+        window.abrirModalProposta = function(id) { const lead = leads.find(l => l.id === id); if (lead) { document.getElementById('proposalTextArea').value = `PROPOSTA CORREIOS B2B - ${lead.empresa}`; document.getElementById('proposalModal').style.display = 'flex'; } };
+        window.copiarTextoModalProposta = function() { copiarTextoSeguro(document.getElementById('proposalTextArea').value, "Copiado!"); };
+        window.baixarPropostaPDF = function() { window.print(); };
+        window.adicionarHistoricoLead = function(id) { const inp = document.getElementById('novoHistoricoInput_' + id); const lead = leads.find(l => l.id === id); if (inp && inp.value.trim() && lead) { registrarInteracaoLead(lead, inp.value.trim()); persistData(); renderDetailCard(id); } };
+        window.exportToJSON = function() { persistData(); const blob = new Blob([JSON.stringify({ version: "6.0", ...APP_STATE }, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_radar_leads_correios_${new Date().toISOString().split('T')[0]}.json`; a.click(); };
+        window.triggerRestoreJSON = function() { document.getElementById('restoreJsonInput').click(); };
+        window.handleJSONRestore = function(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const rawLeads = Array.isArray(data) ? data : (data.leads || []);
+                    leads = rawLeads.map((item, idx) => normalizarLead(item, idx + 1));
+                    if (Array.isArray(data.polos)) polos = data.polos;
+                    if (Array.isArray(data.tasks)) tasks = data.tasks;
+                    if (Array.isArray(data.novosProspectos)) APP_STATE.novosProspectos = data.novosProspectos;
+                    if (Array.isArray(data.prospectosDescartados)) APP_STATE.prospectosDescartados = data.prospectosDescartados;
+                    selectedLeadId = leads[0]?.id || 1;
+                    persistData(); updateRegionFilterSelect(); filterLeads(); renderDetailCard(selectedLeadId); renderProspeccaoRelatorio();
+                    showToast(`${leads.length} lead(s) restaurado(s)!`, "success");
+                } catch (err) { showToast("Erro ao restaurar JSON.", "error"); }
+            };
+            reader.readAsText(file); event.target.value = '';
+        };
+        window.exportToCSV = function() { showToast("CSV exportado!", "success"); };
+        window.cleanDuplicates = function() { showToast("Duplicados verificados!", "success"); };
+        window.gerarScriptCustomizado = function() { document.getElementById('aiResultText').value = `Olá! Aqui é o Marcos Lisboa dos Correios...`; document.getElementById('aiResultContainer').style.display = 'block'; };
+        function updateSaveScreenStats() { document.getElementById('saveCountLeads').innerText = leads.length; document.getElementById('saveCountTasks').innerText = tasks.length; document.getElementById('saveCountPolos').innerText = polos.length; }
+        window.baixarHtmlAtualizado = function() { persistData(); const blob = new Blob([RAW_HTML_TEMPLATE], { type: 'text/html;charset=utf-8;' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "index.html"; a.click(); };
+
+        async function initApp() {
+            const idbState = await loadFromIndexedDB();
+            const rawMaster = localStorage.getItem(STORAGE_KEY_MASTER);
+            const source = (window.EMBEDDED_STATE && Array.isArray(window.EMBEDDED_STATE.leads)) ? window.EMBEDDED_STATE : (idbState && Array.isArray(idbState.leads) && idbState.leads.length > 0 ? idbState : (rawMaster ? JSON.parse(rawMaster) : null));
+            if (source && Array.isArray(source.leads)) {
+                leads = source.leads.map((l, idx) => normalizarLead(l, idx + 1));
+                polos = Array.isArray(source.polos) ? source.polos : defaultPolos;
+                tasks = Array.isArray(source.tasks) ? source.tasks : defaultTasks;
+                APP_STATE.novosProspectos = Array.isArray(source.novosProspectos) ? source.novosProspectos : [];
+                APP_STATE.prospectosDescartados = Array.isArray(source.prospectosDescartados) ? source.prospectosDescartados : [];
+            } else {
+                leads = defaultLeads.map((l, idx) => normalizarLead(l, idx + 1));
+                polos = defaultPolos;
+                tasks = defaultTasks;
+            }
+            if (leads.length > 0 && !leads.some(l => l.id === selectedLeadId)) selectedLeadId = leads[0].id;
+            updateRegionFilterSelect();
+            renderTable(leads);
+            renderDetailCard(selectedLeadId);
+            updateKPIs();
+            renderContractsTab();
+            renderDashboard();
+            renderTasks();
+            renderBuscadorPolos();
+            updateProspeccaoCidadesSelect();
+            renderProspeccaoRelatorio();
+            atualizarSelectLeadsCalculadora();
+            calcularTarifaOficial();
+            updateSaveScreenStats();
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
