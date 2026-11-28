@@ -1,25 +1,25 @@
 {
-  "id": "/radar_leads/index.html?v=4",
-  "name": "Radar de Leads Corporativos - Correios B2B",
-  "short_name": "RL Radar",
-  "start_url": "/radar_leads/index.html",
-  "scope": "/radar_leads/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#070b14",
-  "theme_color": "#070b14",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+"id": "/radar_leads/?app=rl-radar-correios",
+"name": "RL Radar - Leads Corporativos Correios",
+"short_name": "RL Radar",
+"start_url": "/radar_leads/?app=rl-radar-correios",
+"scope": "/radar_leads/",
+"display": "standalone",
+"orientation": "portrait",
+"background_color": "#070b14",
+"theme_color": "#070b14",
+"icons": [
+{
+"src": "./icon-192.png?v=5",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "./icon-512.png?v=5",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any"
+}
+]
 }
