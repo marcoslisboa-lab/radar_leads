@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,8 +8,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Radar de Leads Corporativos - Correios B2B</title>
-    <link rel="manifest" id="pwaManifestLink">
+    <title>RL Radar - Leads Corporativos Correios</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=5">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=5">
+    <link rel="apple-touch-icon" href="./icon-512.png?v=5">
+    <link rel="manifest" href="./manifest.json?v=5">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: #070b14; color: #f3f4f6; padding: 12px; padding-bottom: 28px; }
@@ -321,9 +325,9 @@
                 <div style="background:#070b14; border:1px solid #1e293b; border-radius:10px; padding:10px;">
                     <div id="calcPesoResumoBox" style="font-size:11px; color:#cbd5e1; margin-bottom:8px;">Peso Tarifado: 500g</div>
                     <div class="cost-grid">
-                        <div class="cost-item"><label>Unit. Balcão</label><span id="calcUnitBalcao" style="color:#fca5a5;">R$ 0,00</span></div>
+                        <div class="cost-item"><label>Unit. Balcão</label><span id="calcUnitBalcao" style="color:#fca5e5;">R$ 0,00</span></div>
                         <div class="cost-item yellow"><label>Unit. Contrato</label><span id="calcUnitContrato">R$ 0,00</span></div>
-                        <div class="cost-item"><label>Mensal Balcão</label><span id="calcMensalBalcao" style="color:#fca5a5;">R$ 0,00</span></div>
+                        <div class="cost-item"><label>Mensal Balcão</label><span id="calcMensalBalcao" style="color:#fca5e5;">R$ 0,00</span></div>
                         <div class="cost-item yellow"><label>Mensal Contrato</label><span id="calcMensalContrato">R$ 0,00</span></div>
                     </div>
                     <div class="green-banner">
@@ -482,6 +486,13 @@
     <div id="viewSave" class="view-section">
         <div class="card-panel">
             <div class="panel-header"><span class="panel-title" style="color: #eab308;">📱 App Celular & Backup</span></div>
+            <div id="pwaInstallBanner" style="background-color: #111827; border: 1px solid #10b981; border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+                <div style="font-size: 12px; font-weight: 800; color: #34d399; margin-bottom: 6px;">📲 Instalar como Aplicativo no Celular (Ícone RL Radar):</div>
+                <p style="font-size: 11px; color: #e2e8f0; line-height: 1.5; margin-bottom: 10px;">
+                    No Google Chrome, toque nos <strong>3 pontinhos (⋮)</strong> no canto superior direito e escolha <strong>"Adicionar à tela inicial"</strong> ➔ <strong>"Instalar aplicativo"</strong>.
+                </p>
+                <button id="btnInstallPwaNative" class="btn btn-green" style="display:none; width:100%; justify-content:center; padding:10px; font-size:12px;" onclick="triggerNativePwaInstall()">📲 Instalar App na Tela Inicial Agora</button>
+            </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
                 <div class="kpi-card"><div class="kpi-info"><label>Leads</label><span id="saveCountLeads">0</span></div></div>
                 <div class="kpi-card"><div class="kpi-info"><label>Tarefas</label><span id="saveCountTasks" style="color:#34d399;">0</span></div></div>
@@ -611,6 +622,42 @@
         const REDESIM_CNPJ_URL = 'https://solucoes.receita.fazenda.gov.br/Servicos/cnpjreva/cnpjreva_solicitacao.asp';
         const OUTLOOK_CORREIOS_URL = 'https://outlook.cloud.microsoft/mail/marcoslisboagarcia@correios.com.br/deeplink/compose';
         const MUNICIPIOS_AUTORIZADOS = ["Conchas", "Cesário Lange", "Pereiras", "Laranjal Paulista", "Tietê", "Bragança Paulista", "Campo Limpo Paulista"];
+
+        // REGISTRO DO SERVICE WORKER REAL DO REPOSITÓRIO (sw.js) + PERSISTÊNCIA
+        (function setupMobilePWA() {
+            try {
+                if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
+                    navigator.serviceWorker.register('./sw.js?v=5').then((reg) => {
+                        if (reg && reg.update) reg.update().catch(() => {});
+                    }).catch(() => {});
+                }
+                if (navigator.storage && navigator.storage.persist) {
+                    navigator.storage.persist().catch(() => {});
+                }
+            } catch (e) {}
+        })();
+
+        let deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const btnInstall = document.getElementById('btnInstallPwaNative');
+            if (btnInstall) btnInstall.style.display = 'inline-flex';
+        });
+
+        window.triggerNativePwaInstall = async function() {
+            if (!deferredInstallPrompt) {
+                showToast("Toque nos 3 pontinhos (⋮) do Chrome > Adicionar à tela inicial.", "info");
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast("Aplicativo instalado na tela inicial do celular!", "success");
+            }
+            deferredInstallPrompt = null;
+        };
+
         const DOCS_CHECKLIST_ITEMS = [
             { key: 'cnpj', label: 'Cartão CNPJ Atualizado' },
             { key: 'contratoSocial', label: 'Contrato Social / Requerimento Empresário' },
@@ -734,14 +781,6 @@
             el.value = digits.length > 5 ? digits.replace(/^(\d{5})(\d)/, '$1-$2') : digits;
             if (digits.length === 8 && digits !== ultimoCepConsultado) {
                 setTimeout(() => buscarEnderecoPorCep(digits), 120);
-            }
-        };
-
-        window.mascaraEBuscaCepInput = function(el) {
-            const digits = el.value.replace(/\D/g, '').slice(0, 8);
-            el.value = digits.length > 5 ? digits.replace(/^(\d{5})(\d)/, '$1-$2') : digits;
-            if (digits.length === 8 && digits !== ultimoCepConsultado) {
-                buscarEnderecoPorCep(digits);
             }
         };
 
@@ -1135,7 +1174,7 @@
 
         window.gerarPromptSemanalIA = function() {
             const bloqueados = Array.from(new Set([...leads.map(l => l.empresa), ...(APP_STATE.prospectosDescartados || []).map(d => d.empresa || d)])).filter(Boolean).join('; ');
-            const prompt = `Pesquise novas empresas B2B usando fontes públicas e gratuitas exclusivamente em: Conchas, Cesário Lange, Pereiras, Laranjal Paulista, Tietê, Bragança Paulista e Campo Limpo Paulista (SP). Não inclua Botucatu. Evite repetir: [${bloqueados}].\n\nFORMATO:\nCidade: [Cidade]\nEmpresa: [Nome]\nCNPJ: [CNPJ]\nSegmento: [Segmento]\nTelefone: [Telefone]\nE-mail: [E-mail]`;
+            const prompt = `Pesquise AGORA novas empresas B2B usando fontes públicas e gratuitas exclusivamente em: Conchas, Cesário Lange, Pereiras, Laranjal Paulista, Tietê, Bragança Paulista e Campo Limpo Paulista (SP). Não inclua Botucatu. Evite repetir: [${bloqueados}].\n\nFORMATO:\nCidade: [Cidade]\nEmpresa: [Nome]\nCNPJ: [CNPJ]\nSegmento: [Segmento]\nTelefone: [Telefone]\nE-mail: [E-mail]`;
             copiarTextoSeguro(prompt, "Prompt semanal com exclusão de cadastrados + descartados copiado!");
         };
 
@@ -1376,3 +1415,4 @@
     </script>
 </body>
 </html>
+```
